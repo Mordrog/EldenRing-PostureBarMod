@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\ImGui">
+      <UniqueIdentifier>{3a2ea10f-0798-4673-ab4f-776b4f3e7e24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Main">
+      <UniqueIdentifier>{d261536c-7c67-4544-9143-cdd34dfa3e7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MinHook">
+      <UniqueIdentifier>{9119d17f-c20f-416e-adcf-f6edaa0112fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Ini">
+      <UniqueIdentifier>{a1106453-cf7f-4c30-8971-5e4c020e7a7a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PostureBarMod.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ImGui\imgui.cpp">
+      <Filter>Source Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ImGui\imgui_demo.cpp">
+      <Filter>Source Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ImGui\imgui_draw.cpp">
+      <Filter>Source Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ImGui\imgui_impl_dx12.cpp">
+      <Filter>Source Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ImGui\imgui_impl_win32.cpp">
+      <Filter>Source Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ImGui\imgui_tables.cpp">
+      <Filter>Source Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ImGui\imgui_widgets.cpp">
+      <Filter>Source Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Minhook\buffer.c">
+      <Filter>Source Files\MinHook</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Minhook\hde32.c">
+      <Filter>Source Files\MinHook</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Minhook\hde64.c">
+      <Filter>Source Files\MinHook</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Minhook\hook.c">
+      <Filter>Source Files\MinHook</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Minhook\trampoline.c">
+      <Filter>Source Files\MinHook</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Main\PostureBarUI.cpp">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Main\Hooking.cpp">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Main\D3DRenderer.cpp">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Main\Logger.cpp">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\PostureBarMod.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ImGui\imconfig.h">
+      <Filter>Source Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ImGui\imgui.h">
+      <Filter>Source Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ImGui\imgui_impl_dx12.h">
+      <Filter>Source Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ImGui\imgui_impl_win32.h">
+      <Filter>Source Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ImGui\imgui_internal.h">
+      <Filter>Source Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ImGui\imstb_rectpack.h">
+      <Filter>Source Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ImGui\imstb_textedit.h">
+      <Filter>Source Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ImGui\imstb_truetype.h">
+      <Filter>Source Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Minhook\buffer.h">
+      <Filter>Source Files\MinHook</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Minhook\hde32.h">
+      <Filter>Source Files\MinHook</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Minhook\hde64.h">
+      <Filter>Source Files\MinHook</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Minhook\MinHook.h">
+      <Filter>Source Files\MinHook</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Minhook\pstdint.h">
+      <Filter>Source Files\MinHook</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Minhook\table32.h">
+      <Filter>Source Files\MinHook</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Minhook\table64.h">
+      <Filter>Source Files\MinHook</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Minhook\trampoline.h">
+      <Filter>Source Files\MinHook</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Main\PostureBarUI.hpp">
+      <Filter>Source Files\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Main\Hooking.hpp">
+      <Filter>Source Files\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Main\Memory.hpp">
+      <Filter>Source Files\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Main\D3DRenderer.hpp">
+      <Filter>Source Files\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Main\Logger.hpp">
+      <Filter>Source Files\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Ini\ini.h">
+      <Filter>Source Files\Ini</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
