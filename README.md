@@ -49,6 +49,11 @@ Here are some common issues you might encounter:
 
 ## Changelog
 
-### Beta 0.1  
+### Beta 0.2.0
+* Increased amount of logging + made special debug version with even more logging
+* Made finding of Elden Ring window use Unicode format (to hopefuly fix treadmark symbol issue)
+* Added option to turn of drawing of bars for entity or bosses in configs
+
+### Beta 0.1.0
 
 * Initial version, should display simple UI bars
