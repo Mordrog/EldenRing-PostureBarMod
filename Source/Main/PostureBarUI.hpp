@@ -18,6 +18,7 @@ namespace ER
 		float resetStaggerTimer = 0.0f;
 		std::chrono::steady_clock::time_point lastTimePoint{};
 
+		static inline bool  drawBars = true;
 		static inline bool  useStaminaForNPC = true;
 		static inline float barWidth = 998.0f;
 		static inline float barHeight = 3.0f;
@@ -50,6 +51,7 @@ namespace ER
 		float resetStaggerTimer = 0.0f;
 		std::chrono::steady_clock::time_point lastTimePoint{};
 
+		static inline bool  drawBars = true;
 		static inline bool  useStaminaForNPC = true;
 		static inline float barWidth = 138.0f;
 		static inline float barHeight = 5.0f;

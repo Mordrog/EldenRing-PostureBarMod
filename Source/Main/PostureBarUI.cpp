@@ -101,128 +101,129 @@ namespace ER
             ImGui::GetBackgroundDrawList()->AddRect(ImVec2(ScreenParams::posX, ScreenParams::posY), ImVec2(ScreenParams::posX + adjustedViewportX, ScreenParams::posY + adjustedViewportY), ImColor(255, 255, 255,255), 0, 0, 1.0f);
         }
 
-        for (IndexType i = 0; i < BOSS_CHR_ARRAY_LEN; i++)
-            if (auto bossPostureBar = bossPostureBars[i]; bossPostureBar && bossPostureBar->isVisible)
-            {
-                auto&& timePoint = std::chrono::steady_clock::now();
-
-                float staggerRatio = bossPostureBar->stagger / bossPostureBar->maxStagger;
-
-                float height = BossPostureBarData::barHeight * ScreenParams::gameToViewportScaling;
-                float width = BossPostureBarData::barWidth * ScreenParams::gameToViewportScaling;
-                ImVec2 viewportPosition = ImVec2(BossPostureBarData::firstBossScreenX, BossPostureBarData::firstBossScreenY) * ScreenParams::gameToViewportScaling;
-
-                // apply screen position offset
-                viewportPosition.x += ScreenParams::posX;
-                viewportPosition.y += ScreenParams::posY;
-
-                // apply offset if bar is for second and third boss
-                viewportPosition.y -= ((float)i * BossPostureBarData::nextBossBarDiffScreenY) * ScreenParams::gameToViewportScaling;
-
-                // apply offset so x is in middle of bar 
-                viewportPosition.x -= (width * 0.5f);
-
-                if (bossPostureBar->isResetStagger)
+        if (BossPostureBarData::drawBars)
+            for (IndexType i = 0; i < BOSS_CHR_ARRAY_LEN; i++)
+                if (auto bossPostureBar = bossPostureBars[i]; bossPostureBar && bossPostureBar->isVisible)
                 {
-                    bossPostureBar->resetStaggerTimer -= std::chrono::duration_cast<std::chrono::duration<float>>(timePoint - bossPostureBar->lastTimePoint).count();
-                    bossPostureBar->lastTimePoint = timePoint;
+                    auto&& timePoint = std::chrono::steady_clock::now();
 
-                    if (bossPostureBar->resetStaggerTimer <= 0.0f)
-                        bossPostureBar->isResetStagger = false;
-                    else
+                    float staggerRatio = bossPostureBar->stagger / bossPostureBar->maxStagger;
+
+                    float height = BossPostureBarData::barHeight * ScreenParams::gameToViewportScaling;
+                    float width = BossPostureBarData::barWidth * ScreenParams::gameToViewportScaling;
+                    ImVec2 viewportPosition = ImVec2(BossPostureBarData::firstBossScreenX, BossPostureBarData::firstBossScreenY) * ScreenParams::gameToViewportScaling;
+
+                    // apply screen position offset
+                    viewportPosition.x += ScreenParams::posX;
+                    viewportPosition.y += ScreenParams::posY;
+
+                    // apply offset if bar is for second and third boss
+                    viewportPosition.y -= ((float)i * BossPostureBarData::nextBossBarDiffScreenY) * ScreenParams::gameToViewportScaling;
+
+                    // apply offset so x is in middle of bar 
+                    viewportPosition.x -= (width * 0.5f);
+
+                    if (bossPostureBar->isResetStagger)
                     {
-                        float timeRatio = 1.0f - bossPostureBar->resetStaggerTimer / BossPostureBarData::resetStaggerTotalTime;
+                        bossPostureBar->resetStaggerTimer -= std::chrono::duration_cast<std::chrono::duration<float>>(timePoint - bossPostureBar->lastTimePoint).count();
+                        bossPostureBar->lastTimePoint = timePoint;
 
-                        ImGui::GetBackgroundDrawList()->PushClipRect(ImVec2{ viewportPosition.x, viewportPosition.y }, ImVec2{ viewportPosition.x + timeRatio * width, viewportPosition.y + height });
+                        if (bossPostureBar->resetStaggerTimer <= 0.0f)
+                            bossPostureBar->isResetStagger = false;
+                        else
+                        {
+                            float timeRatio = 1.0f - bossPostureBar->resetStaggerTimer / BossPostureBarData::resetStaggerTotalTime;
 
-                        const auto color = ImColor(255, 255, 0, 255);
-                        ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2{ viewportPosition.x - 1.0f, viewportPosition.y - 1.0f }, ImVec2{ viewportPosition.x + width + 1.0f, viewportPosition.y + height + 1.0f }, ImColor(255, 255, 255, 255));
-                        ImGui::GetBackgroundDrawList()->AddRectFilled(viewportPosition, ImVec2{ viewportPosition.x + width, viewportPosition.y + height }, color);
+                            ImGui::GetBackgroundDrawList()->PushClipRect(ImVec2{ viewportPosition.x, viewportPosition.y }, ImVec2{ viewportPosition.x + timeRatio * width, viewportPosition.y + height });
 
-                        continue;
+                            const auto color = ImColor(255, 255, 0, 255);
+                            ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2{ viewportPosition.x - 1.0f, viewportPosition.y - 1.0f }, ImVec2{ viewportPosition.x + width + 1.0f, viewportPosition.y + height + 1.0f }, ImColor(255, 255, 255, 255));
+                            ImGui::GetBackgroundDrawList()->AddRectFilled(viewportPosition, ImVec2{ viewportPosition.x + width, viewportPosition.y + height }, color);
+
+                            continue;
+                        }
                     }
+
+                    ImGui::GetBackgroundDrawList()->PushClipRect(ImVec2{ viewportPosition.x, viewportPosition.y }, ImVec2{ viewportPosition.x + staggerRatio * width, viewportPosition.y + height });
+
+                    ImColor color;
+                    if (bossPostureBar->isStamina)
+                        color = ImColor(0, 200, 0, 255);
+                    else
+                        color = ImColor(255, (int)std::lerp(50, 255, staggerRatio), 0, 255);
+
+                    ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2{ viewportPosition.x - 1.0f, viewportPosition.y - 1.0f }, ImVec2{ viewportPosition.x + width + 1.0f, viewportPosition.y + height + 1.0f }, ImColor(255, 255, 255, 0));
+                    ImGui::GetBackgroundDrawList()->AddRectFilled(viewportPosition, ImVec2{ viewportPosition.x + width, viewportPosition.y + height }, color);
                 }
 
-                ImGui::GetBackgroundDrawList()->PushClipRect(ImVec2{ viewportPosition.x, viewportPosition.y }, ImVec2{ viewportPosition.x + staggerRatio * width, viewportPosition.y + height });
-
-                ImColor color;
-                if (bossPostureBar->isStamina)
-                    color = ImColor(0, 200, 0, 255);
-                else
-                    color = ImColor(255, (int)std::lerp(50, 255, staggerRatio), 0, 255);
-
-                ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2{ viewportPosition.x - 1.0f, viewportPosition.y - 1.0f }, ImVec2{ viewportPosition.x + width + 1.0f, viewportPosition.y + height + 1.0f }, ImColor(255, 255, 255, 0));
-                ImGui::GetBackgroundDrawList()->AddRectFilled(viewportPosition, ImVec2{ viewportPosition.x + width, viewportPosition.y + height }, color);
-            }
-
-        for (IndexType i = 0; i < ENTITY_CHR_ARRAY_LEN; i++)
-            if (auto postureBar = postureBars[i]; postureBar && postureBar->isVisible)
-            {
-                auto&& timePoint = std::chrono::steady_clock::now();
-
-                float staggerRatio = postureBar->stagger / postureBar->maxStagger;
-                float distanceModifier = postureBar->distanceModifier;
-
-                ImVec2 gamePosition(postureBar->screenX, postureBar->screenY);
-
-                // apply fix offset from predicting previous movement
-                if (PostureBarData::usePositionFixing)
-                    gamePosition -= positionFixOffset(*postureBar, timePoint);
-
-                // apply threshold to in game position
-                gamePosition.x = std::clamp(gamePosition.x, PostureBarData::leftScreenThreshold, PostureBarData::rightScreenThreshold);
-                gamePosition.y = std::clamp(gamePosition.y, PostureBarData::topScreenThreshold, PostureBarData::bottomScreenThreshold);
-
-                // transform in game position into viewport position
-                float height = PostureBarData::barHeight * ScreenParams::gameToViewportScaling;
-                float width = PostureBarData::barWidth * distanceModifier * ScreenParams::gameToViewportScaling;
-                ImVec2 viewportPosition = gamePosition * ScreenParams::gameToViewportScaling;
-
-                // apply offset so x is in middle of bar
-                viewportPosition.x -= (width * 0.5f);
-
-                // apply screen position offset
-                viewportPosition.x += ScreenParams::posX;
-                viewportPosition.y += ScreenParams::posY;
-
-                // apply user specified bar offset
-                viewportPosition.x += PostureBarData::offsetScreenX * ScreenParams::gameToViewportScaling;
-                viewportPosition.y += PostureBarData::offsetScreenY * ScreenParams::gameToViewportScaling;
-
-                if (postureBar->isResetStagger)
+        if (PostureBarData::drawBars)
+            for (IndexType i = 0; i < ENTITY_CHR_ARRAY_LEN; i++)
+                if (auto postureBar = postureBars[i]; postureBar && postureBar->isVisible)
                 {
-                    postureBar->resetStaggerTimer -= std::chrono::duration_cast<std::chrono::duration<float>>(timePoint - postureBar->lastTimePoint).count();
-                    postureBar->lastTimePoint = timePoint;
+                    auto&& timePoint = std::chrono::steady_clock::now();
 
-                    if (postureBar->resetStaggerTimer <= 0.0f)
-                        postureBar->isResetStagger = false;
-                    else
+                    float staggerRatio = postureBar->stagger / postureBar->maxStagger;
+                    float distanceModifier = postureBar->distanceModifier;
+
+                    ImVec2 gamePosition(postureBar->screenX, postureBar->screenY);
+
+                    // apply fix offset from predicting previous movement
+                    if (PostureBarData::usePositionFixing)
+                        gamePosition -= positionFixOffset(*postureBar, timePoint);
+
+                    // apply threshold to in game position
+                    gamePosition.x = std::clamp(gamePosition.x, PostureBarData::leftScreenThreshold, PostureBarData::rightScreenThreshold);
+                    gamePosition.y = std::clamp(gamePosition.y, PostureBarData::topScreenThreshold, PostureBarData::bottomScreenThreshold);
+
+                    // transform in game position into viewport position
+                    float height = PostureBarData::barHeight * ScreenParams::gameToViewportScaling;
+                    float width = PostureBarData::barWidth * distanceModifier * ScreenParams::gameToViewportScaling;
+                    ImVec2 viewportPosition = gamePosition * ScreenParams::gameToViewportScaling;
+
+                    // apply offset so x is in middle of bar
+                    viewportPosition.x -= (width * 0.5f);
+
+                    // apply screen position offset
+                    viewportPosition.x += ScreenParams::posX;
+                    viewportPosition.y += ScreenParams::posY;
+
+                    // apply user specified bar offset
+                    viewportPosition.x += PostureBarData::offsetScreenX * ScreenParams::gameToViewportScaling;
+                    viewportPosition.y += PostureBarData::offsetScreenY * ScreenParams::gameToViewportScaling;
+
+                    if (postureBar->isResetStagger)
                     {
-                        float timeRatio = 1.0f - postureBar->resetStaggerTimer / PostureBarData::resetStaggerTotalTime;
+                        postureBar->resetStaggerTimer -= std::chrono::duration_cast<std::chrono::duration<float>>(timePoint - postureBar->lastTimePoint).count();
+                        postureBar->lastTimePoint = timePoint;
 
-                        ImGui::GetBackgroundDrawList()->PushClipRect(ImVec2{ viewportPosition.x, viewportPosition.y }, ImVec2{ viewportPosition.x + timeRatio * width, viewportPosition.y + height });
+                        if (postureBar->resetStaggerTimer <= 0.0f)
+                            postureBar->isResetStagger = false;
+                        else
+                        {
+                            float timeRatio = 1.0f - postureBar->resetStaggerTimer / PostureBarData::resetStaggerTotalTime;
 
-                        const auto color = ImColor(255, 255, 0, 255);
-                        ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2{ viewportPosition.x - 1.0f, viewportPosition.y - 1.0f }, ImVec2{ viewportPosition.x + width + 1.0f, viewportPosition.y + height + 1.0f }, ImColor(255, 255, 255, 255));
-                        ImGui::GetBackgroundDrawList()->AddRectFilled(viewportPosition, ImVec2{ viewportPosition.x + width, viewportPosition.y + height }, color);
+                            ImGui::GetBackgroundDrawList()->PushClipRect(ImVec2{ viewportPosition.x, viewportPosition.y }, ImVec2{ viewportPosition.x + timeRatio * width, viewportPosition.y + height });
 
-                        continue;
+                            const auto color = ImColor(255, 255, 0, 255);
+                            ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2{ viewportPosition.x - 1.0f, viewportPosition.y - 1.0f }, ImVec2{ viewportPosition.x + width + 1.0f, viewportPosition.y + height + 1.0f }, ImColor(255, 255, 255, 255));
+                            ImGui::GetBackgroundDrawList()->AddRectFilled(viewportPosition, ImVec2{ viewportPosition.x + width, viewportPosition.y + height }, color);
+
+                            continue;
+                        }
                     }
+
+
+                    ImGui::GetBackgroundDrawList()->PushClipRect(ImVec2{ viewportPosition.x, viewportPosition.y }, ImVec2{ viewportPosition.x + staggerRatio * width, viewportPosition.y + height });
+
+                    ImColor color;
+                    if (postureBar->isStamina)
+                        color = ImColor(80, 200, 104, 255);
+                    else
+                        color = ImColor(255, (int)std::lerp(50, 255, staggerRatio), 0, 255);
+
+                    ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2{ viewportPosition.x - 1.0f, viewportPosition.y - 1.0f }, ImVec2{ viewportPosition.x + width + 1.0f, viewportPosition.y + height + 1.0f }, ImColor(255, 255, 255, 0));
+                    ImGui::GetBackgroundDrawList()->AddRectFilled(viewportPosition, ImVec2{ viewportPosition.x + width, viewportPosition.y + height }, color);
                 }
-
-
-                ImGui::GetBackgroundDrawList()->PushClipRect(ImVec2{ viewportPosition.x, viewportPosition.y }, ImVec2{ viewportPosition.x + staggerRatio * width, viewportPosition.y + height });
-
-                ImColor color;
-                if (postureBar->isStamina)
-                    color = ImColor(80, 200, 104, 255);
-                else
-                    color = ImColor(255, (int)std::lerp(50, 255, staggerRatio), 0, 255);
-
-                ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2{ viewportPosition.x - 1.0f, viewportPosition.y - 1.0f }, ImVec2{ viewportPosition.x + width + 1.0f, viewportPosition.y + height + 1.0f }, ImColor(255, 255, 255, 0));
-                ImGui::GetBackgroundDrawList()->AddRectFilled(viewportPosition, ImVec2{ viewportPosition.x + width, viewportPosition.y + height }, color);
-
-            }
     }
 
     void PostureBarUI::updateUIBarStructs(uintptr_t moveMapStep, uintptr_t time)

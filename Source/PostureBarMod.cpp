@@ -26,6 +26,7 @@ bool loadIni()
         ScreenParams::autoPositionSetup = ini["General"].get("AutoPositionSetup") == "true";
         ScreenParams::autoGameToViewportScaling = ini["General"].get("AutoGameToScreenScaling") == "true";
 
+        BossPostureBarData::drawBars = ini["Boss Posture Bar"].get("DrawBars") == "true";
         BossPostureBarData::useStaminaForNPC = ini["Boss Posture Bar"].get("UseStaminaForNPC") == "true";
         BossPostureBarData::barWidth = std::stof(ini["Boss Posture Bar"].get("BarWidth"));
         BossPostureBarData::barHeight = std::stof(ini["Boss Posture Bar"].get("BarHeight"));
@@ -34,6 +35,7 @@ bool loadIni()
         BossPostureBarData::firstBossScreenY = std::stof(ini["Boss Posture Bar"].get("FirstBossScreenY"));
         BossPostureBarData::nextBossBarDiffScreenY = std::stof(ini["Boss Posture Bar"].get("NextBossBarDiffScreenY"));
 
+        PostureBarData::drawBars = ini["Entity Posture Bar"].get("DrawBars") == "true";
         PostureBarData::useStaminaForNPC = ini["Entity Posture Bar"].get("UseStaminaForNPC") == "true";
         PostureBarData::barWidth = std::stof(ini["Entity Posture Bar"].get("BarWidth"));
         PostureBarData::barHeight = std::stof(ini["Entity Posture Bar"].get("BarHeight"));
@@ -74,6 +76,7 @@ bool loadIni()
     Logger::log("\t\tAutoPositionSetup:" + std::to_string(ScreenParams::autoPositionSetup));
     Logger::log("\t\tAutoGameToScreenScaling:" + std::to_string(ScreenParams::autoGameToViewportScaling));
     Logger::log("\tBoss Posture Bar:");
+    Logger::log("\t\tDrawBars: " + std::to_string(BossPostureBarData::drawBars));
     Logger::log("\t\tUseStaminaForNPC: " + std::to_string(BossPostureBarData::useStaminaForNPC));
     Logger::log("\t\tBarWidth: " + std::to_string(BossPostureBarData::barWidth));
     Logger::log("\t\tBarHeight: " + std::to_string(BossPostureBarData::barHeight));
@@ -82,6 +85,7 @@ bool loadIni()
     Logger::log("\t\tFirstBossScreenY: " + std::to_string(BossPostureBarData::firstBossScreenY));
     Logger::log("\t\tNextBossBarDiffScreenY: " + std::to_string(BossPostureBarData::nextBossBarDiffScreenY));
     Logger::log("\tEntity Posture Bar:");
+    Logger::log("\t\tDrawBars: " + std::to_string(PostureBarData::drawBars));
     Logger::log("\t\tUseStaminaForNPC: " + std::to_string(PostureBarData::useStaminaForNPC));
     Logger::log("\t\tBarWidth: " + std::to_string(PostureBarData::barWidth));
     Logger::log("\t\tBarHeight: " + std::to_string(PostureBarData::barHeight));
