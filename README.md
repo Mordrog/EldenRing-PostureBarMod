@@ -18,7 +18,7 @@ The mod was created with the intention of presenting enemy posture as a UI eleme
 First you will have to remember that you cannot play on official servers using this (or in fact any) mod.
 To install mod you will have to follow this stes:
 * Download Elden Mod Loader from https://www.nexusmods.com/eldenring/mods/117, and extract it's content where game .exe is
-* Download this mod .zip file from {tobeadded} and extract it's contet inside "mods" folder where game .exe is, on steam path will be something like that "steamapps\common\ELDEN RING\Game\mods"
+* Download this mod .zip file from [Nexus Mods](https://www.nexusmods.com/eldenring/mods/3405) or [Github](https://github.com/Mordrog/EldenRing-PostureBarMod/releases/) and extract it's contet inside "mods" folder where game .exe is, on steam path will be something like that "steamapps\common\ELDEN RING\Game\mods"
 * **DISABLE ANTI CHEAT** -  you can for instance use https://www.nexusmods.com/eldenring/mods/90/%EF%BB%BF
 * Run game
 
@@ -30,9 +30,9 @@ Here are some common issues you might encounter:
 
 * ***Bars are visible while menu is open*** - currently I have no good solution for that, as right now mod just reads from any health bar in game memery and try to add posture bar where it should be. If you have any idea or information how this could be handled you can share it
 * ***Boss bar is visible after dying on first boss battle in game (before cave)*** - this bar is still in game memory for some reason, you will either have to restart game or start fight with new boss, where it will get replaced and issue should not appear anymore
-* ***Boss bar is not well alligned with health bar*** - it might happen especially when using other mods that changes those positions, like Reforged. You will have to set new value inside .ini file for first FirstBossScreen. You can also use special tool that can help you find proper offset inside game, by setting OffsetTest to true inside .ini file
-* ***Bars in general are not alligned*** - most likely mod auto position or / and auto scaling has failed, in that case you might have to set them yourself, to figure out how those parameters should be set you can set OffsetTest to true and start game, from there you will have some options to change offsets and save them inside .ini file. In extreme case where nothing seems to work, you should report this issue on git or nexus mod page.
-* ***Bars are alligned when static, but they shake a lot when moving*** - most likely it happens due to position fixing algorithm, you can turn it off inside .ini file, but then bars will always slightly drag after health bars OR you can try to adjust modifier values PositionFixingMultiplier inside .ini file or inside game by setting OffsetTest to true inside .ini file (remember to save those values). If posture bars tend to drag behind health bar then PositionFixingMultiplier should be bigger, if they tend to go ahead of health bar, then PositionFixingMultiplier should be lower
+* ***Boss bar is not well aligned with health bar*** - it might happen especially when using other mods that changes those positions, like Reforged. You will have to set new value inside .ini file for first FirstBossScreen. You can also use special tool that can help you find proper offset inside game, by setting OffsetTest to true inside .ini file
+* ***Bars in general are not aligned*** - most likely mod auto position or / and auto scaling has failed, in that case you might have to set them yourself, to figure out how those parameters should be set you can set OffsetTest to true and start game, from there you will have some options to change offsets and save them inside .ini file. In extreme case where nothing seems to work, you should report this issue on git or nexus mod page.
+* ***Bars are aligned when static, but they shake a lot when moving*** - most likely it happens due to position fixing algorithm, you can turn it off inside .ini file, but then bars will always slightly drag after health bars OR you can try to adjust modifier values PositionFixingMultiplier inside .ini file or inside game by setting OffsetTest to true inside .ini file (remember to save those values). If posture bars tend to drag behind health bar then PositionFixingMultiplier should be bigger, if they tend to go ahead of health bar, then PositionFixingMultiplier should be lower
 * ***Mod does not work / Mod crashes on start*** - report issue on git or nexus mod page, best to include logs, you can generate those by setting Log to true inside .ini file
 
 ## ToDo
@@ -45,7 +45,7 @@ Here are some common issues you might encounter:
 **[Nordgaren](https://github.com/Nordgaren)** author of [ERD-Tools](https://github.com/Nordgaren/Erd-Tools)\
 **[ImAxel0](https://github.com/ImAxel0)** author of [Elden-Menu](https://github.com/ImAxel0/Elden-Menu)\
 **[NightFyre](https://github.com/NightFyre)** author of [ELDENRING-INTERNAL](https://github.com/NightFyre/ELDENRING-INTERNAL) that I based a lot of my source code from\
-**Ingart** for being pasionate tester the best brother
+**Ingart** for being passionate tester the best brother
 
 ## Changelog
 
