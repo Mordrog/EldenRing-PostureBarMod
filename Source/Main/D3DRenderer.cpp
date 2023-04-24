@@ -14,7 +14,8 @@ namespace ER
 
 		m_GamePid = GetCurrentProcessId();
 		m_GameHandle = GetCurrentProcess();
-		m_GameWindow = FindWindowEx(NULL, NULL, "ELDEN RING™", NULL);
+		m_GameWindow = FindWindowExW(NULL, NULL, L"ELDEN RING™", NULL);
+		
 		if (m_GameWindow == NULL)
 		{
 			Logger::log("Failed to find \"ELDEN RING™\" window, trying to get via GetForegroundWindow", LogLevel::Warning);
@@ -375,7 +376,7 @@ namespace ER
 			ImGuiIO& io = ImGui::GetIO();
 			io.IniFilename = NULL;
 
-			programData->m_GameWindow = FindWindowEx(NULL, NULL, "ELDEN RING™", NULL);
+			programData->m_GameWindow = FindWindowExW(NULL, NULL, L"ELDEN RING™", NULL);
 			if (programData->m_GameWindow == NULL)
 			{
 				Logger::log("Failed to find \"ELDEN RING™\" window, trying to get via GetForegroundWindow", LogLevel::Warning);
