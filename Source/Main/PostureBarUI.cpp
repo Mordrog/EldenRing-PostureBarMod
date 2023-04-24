@@ -50,6 +50,7 @@ namespace ER
             {
                 ScreenParams::gameToViewportScaling = std::min(viewportScaleX, viewportScaleY);
                 ScreenParams::autoGameToViewportScaling = false;
+                Logger::log("Set ScreenParams::gameToViewportScaling to: " + std::to_string(ScreenParams::gameToViewportScaling));
             }
 
             if (ScreenParams::autoPositionSetup)
@@ -57,6 +58,8 @@ namespace ER
                 ScreenParams::posX = (viewportSize.x - std::ceilf(ScreenParams::inGameCoordSizeX * ScreenParams::gameToViewportScaling)) * 0.5f;
                 ScreenParams::posY = (viewportSize.y - std::ceilf(ScreenParams::inGameCoordSizeY * ScreenParams::gameToViewportScaling)) * 0.5f;
                 ScreenParams::autoPositionSetup = false;
+                Logger::log("Set ScreenParams::posX to: " + std::to_string(ScreenParams::posX));
+                Logger::log("Set ScreenParams::posY to: " + std::to_string(ScreenParams::posY));
             }
         }
 
@@ -225,6 +228,11 @@ namespace ER
     void PostureBarUI::updateUIBarStructs(uintptr_t moveMapStep, uintptr_t time)
     {
         updateUIBarStructsOriginal(moveMapStep, time);
+#ifdef _DEBUG
+        try
+        {
+#endif // _DEBUG
+        Logger::log("Entered updateUIBarStructs", LogLevel::Debug);
 
         auto&& worldChar = (GameData::WorldChrMan*)RPM<uintptr_t>(g_Hooking->worldChrSignature);
         auto&& feMan = (GameData::CSFeManImp*)RPM<uintptr_t>(g_Hooking->CSFeManSignature);
@@ -338,5 +346,21 @@ namespace ER
             {
                 g_postureUI->postureBars[i] = std::nullopt;
             }
+
+#ifdef _DEBUG
+        }
+        catch (const std::exception& e)
+        {
+            Logger::useLogger = true;
+            Logger::log(e.what(), LogLevel::Error);
+            throw;
+        }
+        catch (...)
+        {
+            Logger::useLogger = true;
+            Logger::log("Unknown exception during PostureBarUI::updateUIBarStructs", LogLevel::Error);
+            throw;
+        }
+#endif // _DEBUG
     }
 }

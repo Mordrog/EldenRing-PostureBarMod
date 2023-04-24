@@ -64,6 +64,41 @@ bool loadIni()
         return false;
     }
 
+    Logger::log("Loaded ini settings: ");
+    Logger::log("\tGeneral:");
+    Logger::log("\t\tInGameScreenCoordWidth: " + std::to_string(ScreenParams::inGameCoordSizeX));
+    Logger::log("\t\tInGameScreenCoordHeight: " + std::to_string(ScreenParams::inGameCoordSizeY));
+    Logger::log("\t\tScreenPositionX: " + std::to_string(ScreenParams::posX));
+    Logger::log("\t\tScreenPositionY: " + std::to_string(ScreenParams::posY));
+    Logger::log("\t\tGameToScreenScaling:" + std::to_string(ScreenParams::gameToViewportScaling));
+    Logger::log("\t\tAutoPositionSetup:" + std::to_string(ScreenParams::autoPositionSetup));
+    Logger::log("\t\tAutoGameToScreenScaling:" + std::to_string(ScreenParams::autoGameToViewportScaling));
+    Logger::log("\tBoss Posture Bar:");
+    Logger::log("\t\tUseStaminaForNPC: " + std::to_string(BossPostureBarData::useStaminaForNPC));
+    Logger::log("\t\tBarWidth: " + std::to_string(BossPostureBarData::barWidth));
+    Logger::log("\t\tBarHeight: " + std::to_string(BossPostureBarData::barHeight));
+    Logger::log("\t\tResetStaggerTotalTime: " + std::to_string(BossPostureBarData::resetStaggerTotalTime));
+    Logger::log("\t\tFirstBossScreenX: " + std::to_string(BossPostureBarData::firstBossScreenX));
+    Logger::log("\t\tFirstBossScreenY: " + std::to_string(BossPostureBarData::firstBossScreenY));
+    Logger::log("\t\tNextBossBarDiffScreenY: " + std::to_string(BossPostureBarData::nextBossBarDiffScreenY));
+    Logger::log("\tEntity Posture Bar:");
+    Logger::log("\t\tUseStaminaForNPC: " + std::to_string(PostureBarData::useStaminaForNPC));
+    Logger::log("\t\tBarWidth: " + std::to_string(PostureBarData::barWidth));
+    Logger::log("\t\tBarHeight: " + std::to_string(PostureBarData::barHeight));
+    Logger::log("\t\tResetStaggerTotalTime: " + std::to_string(PostureBarData::resetStaggerTotalTime));
+    Logger::log("\t\tOffsetScreenX: " + std::to_string(PostureBarData::offsetScreenX));
+    Logger::log("\t\tOffsetScreenY: " + std::to_string(PostureBarData::offsetScreenY));
+    Logger::log("\t\tLeftScreenThreshold: " + std::to_string(PostureBarData::leftScreenThreshold));
+    Logger::log("\t\tRightScreenThreshold: " + std::to_string(PostureBarData::rightScreenThreshold));
+    Logger::log("\t\tTopScreenThreshold: " + std::to_string(PostureBarData::topScreenThreshold));
+    Logger::log("\t\tBottomScreenThreshold: " + std::to_string(PostureBarData::bottomScreenThreshold));
+    Logger::log("\t\tUsePositionFixing: " + std::to_string(PostureBarData::usePositionFixing));
+    Logger::log("\t\tPositionFixingMultiplierX: " + std::to_string(PostureBarData::positionFixingMultiplierX));
+    Logger::log("\t\tPositionFixingMultiplierY: " + std::to_string(PostureBarData::positionFixingMultiplierY));
+    Logger::log("\tDebug:");
+    Logger::log("\t\tLog: " + std::to_string(Logger::useLogger));
+    Logger::log("\t\tOffsetTest: " + std::to_string(offsetTesting));
+
     return true;
 }
 
@@ -129,6 +164,7 @@ void MainThread()
     g_Hooking = std::make_unique<Hooking>();
     g_Hooking->Hook();
 
+    Logger::log("Starting Main Loop");
     std::pair<float, float> previousMoveVec{1.f, 1.f};
     int counter = 0;
     while (g_Running)

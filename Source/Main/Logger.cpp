@@ -14,6 +14,8 @@ namespace ER
 				return "Warning: ";
 			case Error:
 				return "Error: ";
+			case Debug:
+				return "Debug: ";
 
 			default:
 				return "";
@@ -28,9 +30,15 @@ namespace ER
 
 	void Logger::log(const std::string_view& msg, LogLevel logLevel, const std::source_location& location)
 	{
+#ifdef NDEBUG
+		if (logLevel == LogLevel::Debug)
+			return;
+#endif // _DEBUG
+
 		if (!useLogger)
 			return;
 
+		std::scoped_lock lock(loggerMutex);
 		if (!logFile.is_open())
 			logFile.open(logFileName, std::ifstream::out);
 

@@ -4,6 +4,7 @@ namespace ER
 {
 	enum class LogLevel
 	{
+		Debug,
 		Log,
 		Warning,
 		Error
@@ -27,5 +28,6 @@ namespace ER
 		static void close();
 
 		static inline bool useLogger = false;
+		static inline std::mutex loggerMutex;
 	};
 }

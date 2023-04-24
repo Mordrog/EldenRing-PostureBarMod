@@ -54,7 +54,7 @@ namespace ER
 		D3DRenderer& operator=(D3DRenderer const&) = delete;
 		D3DRenderer& operator=(D3DRenderer&&) = delete;
 
-		bool m_Init{};
+		bool m_Init = false;
 
 
 		bool Init(IDXGISwapChain3* swapChain);

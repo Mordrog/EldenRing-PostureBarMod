@@ -48,6 +48,7 @@ namespace ER
 		Logger::log("\tGame Game Path: " + std::string(m_GamePath));
 		Logger::log("\tGame Window Width: " + std::to_string(m_GameWidth));
 		Logger::log("\tGame Window Height: " + std::to_string(m_GameHeight));
+		Logger::log("\tIs Window Class Unicode: " + std::to_string(IsWindowUnicode(m_GameWindow)));
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -82,6 +83,10 @@ namespace ER
 
     bool D3DRenderer::InitHook()
     {
+#ifdef _DEBUG
+		try
+		{
+#endif // _DEBUG
 		Logger::log("Init D3DWindow");
 		if (!InitWindow()) 
 		{
@@ -234,11 +239,30 @@ namespace ER
 		SwapChain->Release();
 		SwapChain = NULL;
 		DeleteWindow();
+#ifdef _DEBUG
+		}
+		catch (const std::exception& e)
+		{
+			Logger::useLogger = true;
+			Logger::log(e.what(), LogLevel::Error);
+			throw;
+		}
+		catch (...)
+		{
+			Logger::useLogger = true;
+			Logger::log("Unknown exception during D3DRenderer::InitHook", LogLevel::Error);
+			throw;
+		}
+#endif // _DEBUG
 		return true;
     }
 
 	void D3DRenderer::Overlay(IDXGISwapChain* pSwapChain)
 	{
+#ifdef _DEBUG
+		try
+		{
+#endif // _DEBUG
 		if (m_CommandQueue == nullptr)
 			return;
 
@@ -248,7 +272,10 @@ namespace ER
 		DXGI_SWAP_CHAIN_DESC sc_desc;
 		pSwapChain->QueryInterface(IID_PPV_ARGS(&pSwapChain3));
 		if (pSwapChain3 == nullptr)
+		{
+			Logger::log("Failed to query interface for IDXGISwapChain3", LogLevel::Debug);
 			return;
+		}
 
 		pSwapChain3->GetDesc(&sc_desc);
 
@@ -257,7 +284,10 @@ namespace ER
 			UINT bufferIndex = pSwapChain3->GetCurrentBackBufferIndex();
 			ID3D12Device* pDevice;
 			if (pSwapChain3->GetDevice(IID_PPV_ARGS(&pDevice)) != S_OK)
+			{
+				Logger::log("Failed to get device for ID3D12Device", LogLevel::Warning);
 				return;
+			}
 
 			m_BuffersCounts = sc_desc.BufferCount;
 
@@ -272,6 +302,7 @@ namespace ER
 				{
 					pDevice->Release();
 					pSwapChain3->Release();
+					Logger::log("Failed to create descriptor heap type D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV", LogLevel::Warning);
 					return;
 				}
 			}
@@ -286,6 +317,7 @@ namespace ER
 					pDevice->Release();
 					pSwapChain3->Release();
 					m_DescriptorHeap->Release();
+					Logger::log("Failed to create descriptor heap type D3D12_DESCRIPTOR_HEAP_TYPE_RTV", LogLevel::Warning);
 					return;
 				}
 
@@ -312,6 +344,7 @@ namespace ER
 					}
 					m_rtvDescriptorHeap->Release();
 					delete[]m_CommandAllocator;
+					Logger::log("Failed to create command allocator D3D12_COMMAND_LIST_TYPE_DIRECT buffer idx: " + std::to_string(i), LogLevel::Warning);
 					return;
 				}
 			}
@@ -326,6 +359,7 @@ namespace ER
 					m_CommandAllocator[i]->Release();
 				m_rtvDescriptorHeap->Release();
 				delete[]m_CommandAllocator;
+				Logger::log("Failed to create command list D3D12_COMMAND_LIST_TYPE_DIRECT", LogLevel::Warning);
 				return;
 			}
 
@@ -336,6 +370,7 @@ namespace ER
 				pDevice->CreateRenderTargetView(m_BackBuffer[i], NULL, m_RenderTargets[i]);
 			}
 
+			Logger::log("ImGui CreateContext");
 			ImGui::CreateContext();
 			ImGuiIO& io = ImGui::GetIO();
 			io.IniFilename = NULL;
@@ -347,25 +382,46 @@ namespace ER
 				programData->m_GameWindow = GetForegroundWindow();
 			}
 
-			ImGui_ImplWin32_Init(programData->m_GameWindow);
-			ImGui_ImplDX12_Init(pDevice, m_BuffersCounts, DXGI_FORMAT_R8G8B8A8_UNORM, NULL,
-				m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
-				m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-			ImGui_ImplDX12_CreateDeviceObjects();
+			Logger::log("Init ImGui for found window");
+			if (!ImGui_ImplWin32_Init(programData->m_GameWindow))
+			{
+				Logger::log("Failed to init ImGui for found window", LogLevel::Warning);
+				return;
+			}
+
+			Logger::log("Init ImGui for DX12");
+			if (!ImGui_ImplDX12_Init(pDevice, m_BuffersCounts, DXGI_FORMAT_R8G8B8A8_UNORM, NULL, m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart()))
+			{
+				Logger::log("Failed to init ImGui for DX12", LogLevel::Warning);
+				return;
+			}
+
+			Logger::log("ImGui DX12 create device object");
+			if (!ImGui_ImplDX12_CreateDeviceObjects())
+			{
+				Logger::log("Failed to create ImGui DX12 device object", LogLevel::Warning);
+				return;
+			}
+
 			ImGui::GetIO().ImeWindowHandle = programData->m_GameWindow;
 			m_OldWndProc = SetWindowLongPtr(programData->m_GameWindow, GWLP_WNDPROC, (LONG_PTR)WndProc);
 
 			m_Init = true;
 
 			pDevice->Release();
+
+			Logger::log("ImGui init successful!");
 		}
 
+		Logger::log("ImGui create new farme", LogLevel::Debug);
 		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
+		Logger::log("Draw posture bar UI", LogLevel::Debug);
 		g_postureUI->Draw();
 
+		Logger::log("ImGui end frame", LogLevel::Debug);
 		ImGui::EndFrame();
 
 		UINT bufferIndex = pSwapChain3->GetCurrentBackBufferIndex();
@@ -384,6 +440,7 @@ namespace ER
 		m_CommandList->OMSetRenderTargets(1, &m_RenderTargets[bufferIndex], FALSE, NULL);
 		m_CommandList->SetDescriptorHeaps(1, &m_DescriptorHeap);
 
+		Logger::log("ImGui render", LogLevel::Debug);
 		ImGui::Render();
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), m_CommandList);
 
@@ -392,13 +449,32 @@ namespace ER
 		m_CommandList->ResourceBarrier(1, &barrier);
 		m_CommandList->Close();
 
+		Logger::log("ID3D12CommandList execute command list", LogLevel::Debug);
 		pCmdQueue->ExecuteCommandLists(1, (ID3D12CommandList**)&m_CommandList);
 
+		Logger::log("IDXGISwapChain3 release", LogLevel::Debug);
 		pSwapChain3->Release();
+
+#ifdef _DEBUG
+		}
+		catch (const std::exception& e)
+		{
+			Logger::useLogger = true;
+			Logger::log(e.what(), LogLevel::Error);
+			throw;
+		}
+		catch (...)
+		{
+			Logger::useLogger = true;
+			Logger::log("Unknown exception during D3DRenderer::Overlay", LogLevel::Error);
+			throw;
+		}
+#endif // _DEBUG
 	}
 
 	HRESULT APIENTRY D3DRenderer::HookResizeTarget(IDXGISwapChain* _this, const DXGI_MODE_DESC* pNewTargetParameters)
 	{
+		Logger::log("Enter HookResizeTarget", LogLevel::Debug);
 		g_D3DRenderer->ResetRenderState();
 		return g_D3DRenderer->oResizeTarget(_this, pNewTargetParameters);
 	}
@@ -413,6 +489,7 @@ namespace ER
 
     HRESULT APIENTRY D3DRenderer::HookPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
     {
+		Logger::log("Enter HookPresent", LogLevel::Debug);
 		if (g_KillSwitch) 
 		{
 			Logger::log("Kill switch");
@@ -427,7 +504,8 @@ namespace ER
 
     }
 
-	void D3DRenderer::HookExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists, ID3D12CommandList* ppCommandLists) {
+	void D3DRenderer::HookExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists, ID3D12CommandList* ppCommandLists) 
+	{
 		if (!g_D3DRenderer->m_CommandQueue)
 			g_D3DRenderer->m_CommandQueue = queue;
 
