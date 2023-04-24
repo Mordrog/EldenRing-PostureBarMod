@@ -158,6 +158,7 @@ void MainThread()
     if (!loadIni())
         return;
 
+    std::this_thread::sleep_for(5s);
     Logger::log("Starting Main Thread");
     g_D3DRenderer = std::make_unique<D3DRenderer>();
     g_postureUI = std::make_unique<PostureBarUI>();
