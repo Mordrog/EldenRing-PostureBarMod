@@ -255,7 +255,10 @@ namespace ER
                 auto&& previousBossStaggerBar = g_postureUI->bossPostureBars[i];
 
                 if (!chrIns || chrIns->chrModulelBag->staggerModule->staggerMax <= 0.0f)
+                {
+                    g_postureUI->bossPostureBars[i] = std::nullopt;
                     continue;
+                }
 
                 auto&& timePoint = std::chrono::steady_clock::now();
 
@@ -299,7 +302,10 @@ namespace ER
                 auto&& previousStaggerBar = g_postureUI->postureBars[i];
 
                 if (!chrIns || chrIns->chrModulelBag->staggerModule->staggerMax <= 0.0f)
+                {
+                    g_postureUI->postureBars[i] = std::nullopt;
                     continue;
+                }
 
                 auto&& timePoint = std::chrono::steady_clock::now();
 
