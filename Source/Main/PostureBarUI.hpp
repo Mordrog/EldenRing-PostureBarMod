@@ -78,6 +78,11 @@ namespace ER
 		static inline bool  autoGameToViewportScaling = true;
 	};
 
+	struct TextureData
+	{
+		static inline bool useTextures = true;
+	};
+
 	class PostureBarUI
 	{
 	public:

@@ -4,6 +4,9 @@
 #include "Hooking.hpp"
 #include "PostureBarUI.hpp"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "../Stb/stb_image.h"
+
 IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace ER 
@@ -56,6 +59,54 @@ namespace ER
 	//									    D3DWindow
 	//-----------------------------------------------------------------------------------
 	static uint64_t* MethodsTable = NULL;
+	
+	bool D3DRenderer::loadTextureFileData(const std::string& filename, TextureFileData* textureFileData)
+	{
+		// Load from disk into a raw RGBA buffer
+		int imageWidth = 0;
+		int imageHeight = 0;
+		unsigned char* imageData = stbi_load(filename.c_str(), &imageWidth, &imageHeight, NULL, 4);
+		if (imageData == NULL)
+			return false;
+
+		textureFileData->width = imageWidth;
+		textureFileData->height = imageHeight;
+		textureFileData->data = imageData;
+
+		return true;
+	}
+
+	void D3DRenderer::loadBarTextures()
+	{
+		if (!TextureData::useTextures)
+			return;
+
+		if (!loadTextureFileData(TextureFileData::bossBarFile, &bossBarFileData))
+		{
+			Logger::log("Failed to load \"" + TextureFileData::bossBarFile + "\" texture file", LogLevel::Warning);
+			return;
+		}
+
+		if (!loadTextureFileData(TextureFileData::bossBorderFile, &bossBarBorderFileData))
+		{
+			Logger::log("Failed to load \"" + TextureFileData::bossBorderFile + "\" texture file", LogLevel::Warning);
+			return;
+		}
+
+		if (!loadTextureFileData(TextureFileData::entityBarFile, &entityBarFileData))
+		{
+			Logger::log("Failed to load \"" + TextureFileData::entityBarFile + "\" texture file", LogLevel::Warning);
+			return;
+		}
+
+		if (!loadTextureFileData(TextureFileData::entityBorderFile, &entityBarBorderFileData))
+		{
+			Logger::log("Failed to load \"" + TextureFileData::entityBorderFile + "\" texture file", LogLevel::Warning);
+			return;
+		}
+
+		textureFileDataLoaded = true;
+	}
 
 	bool D3DRenderer::Hook()
 	{
@@ -258,6 +309,173 @@ namespace ER
 		return true;
     }
 
+	// Simple helper function to init an image into a DX12 texture with common settings
+	D3D12TextureData initD3D12Texture(const TextureFileData& textureFileData, ID3D12Device* device, ID3D12DescriptorHeap* descriptor, int descriptor_index)
+	{
+		// We need to pass a D3D12_CPU_DESCRIPTOR_HANDLE in ImTextureID, so make sure it will fit
+		static_assert(sizeof(ImTextureID) >= sizeof(D3D12_CPU_DESCRIPTOR_HANDLE), "D3D12_CPU_DESCRIPTOR_HANDLE is too large to fit in an ImTextureID");
+
+		// We presume here that we have our D3D device pointer in g_pd3dDevice
+		D3D12TextureData textureData;
+
+		// Get CPU/GPU handles for the shader resource view
+		// Normally your engine will have some sort of allocator for these - here we assume that there's an SRV descriptor heap in
+		// g_pd3dSrvDescHeap with at least two descriptors allocated, and descriptor 1 is unused
+		UINT handle_increment = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		textureData.cpuHandle = descriptor->GetCPUDescriptorHandleForHeapStart();
+		textureData.cpuHandle.ptr += (handle_increment * descriptor_index);
+		textureData.gpuHandle = descriptor->GetGPUDescriptorHandleForHeapStart();
+		textureData.gpuHandle.ptr += (handle_increment * descriptor_index);
+
+		int image_width = textureFileData.width;
+		int image_height = textureFileData.height;
+		unsigned char* image_data = textureFileData.data;
+
+		// Create texture resource
+		D3D12_HEAP_PROPERTIES props;
+		memset(&props, 0, sizeof(D3D12_HEAP_PROPERTIES));
+		props.Type = D3D12_HEAP_TYPE_DEFAULT;
+		props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+
+		D3D12_RESOURCE_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		desc.Alignment = 0;
+		desc.Width = image_width;
+		desc.Height = image_height;
+		desc.DepthOrArraySize = 1;
+		desc.MipLevels = 1;
+		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		desc.SampleDesc.Count = 1;
+		desc.SampleDesc.Quality = 0;
+		desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+		desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		ID3D12Resource* pTexture = NULL;
+		device->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_COPY_DEST, NULL, IID_PPV_ARGS(&pTexture));
+
+		// Create a temporary upload resource to move the data in
+		UINT uploadPitch = (image_width * 4 + D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u);
+		UINT uploadSize = image_height * uploadPitch;
+		desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		desc.Alignment = 0;
+		desc.Width = uploadSize;
+		desc.Height = 1;
+		desc.DepthOrArraySize = 1;
+		desc.MipLevels = 1;
+		desc.Format = DXGI_FORMAT_UNKNOWN;
+		desc.SampleDesc.Count = 1;
+		desc.SampleDesc.Quality = 0;
+		desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		props.Type = D3D12_HEAP_TYPE_UPLOAD;
+		props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+
+		ID3D12Resource* uploadBuffer = NULL;
+		HRESULT hr = device->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&uploadBuffer));
+		IM_ASSERT(SUCCEEDED(hr));
+
+		// Write pixels into the upload resource
+		void* mapped = NULL;
+		D3D12_RANGE range = { 0, uploadSize };
+		hr = uploadBuffer->Map(0, &range, &mapped);
+		IM_ASSERT(SUCCEEDED(hr));
+		for (int y = 0; y < image_height; y++)
+			memcpy((void*)((uintptr_t)mapped + y * uploadPitch), image_data + y * image_width * 4, image_width * 4);
+		uploadBuffer->Unmap(0, &range);
+
+		// Copy the upload resource content into the real resource
+		D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
+		srcLocation.pResource = uploadBuffer;
+		srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+		srcLocation.PlacedFootprint.Footprint.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		srcLocation.PlacedFootprint.Footprint.Width = image_width;
+		srcLocation.PlacedFootprint.Footprint.Height = image_height;
+		srcLocation.PlacedFootprint.Footprint.Depth = 1;
+		srcLocation.PlacedFootprint.Footprint.RowPitch = uploadPitch;
+
+		D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
+		dstLocation.pResource = pTexture;
+		dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+		dstLocation.SubresourceIndex = 0;
+
+		D3D12_RESOURCE_BARRIER barrier = {};
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barrier.Transition.pResource = pTexture;
+		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+		// Create a temporary command queue to do the copy with
+		ID3D12Fence* fence = NULL;
+		hr = device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+		IM_ASSERT(SUCCEEDED(hr));
+
+		HANDLE event = CreateEvent(0, 0, 0, 0);
+		IM_ASSERT(event != NULL);
+
+		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+		queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+		queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+		queueDesc.NodeMask = 1;
+
+		ID3D12CommandQueue* cmdQueue = NULL;
+		hr = device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cmdQueue));
+		IM_ASSERT(SUCCEEDED(hr));
+
+		ID3D12CommandAllocator* cmdAlloc = NULL;
+		hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAlloc));
+		IM_ASSERT(SUCCEEDED(hr));
+
+		ID3D12GraphicsCommandList* cmdList = NULL;
+		hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAlloc, NULL, IID_PPV_ARGS(&cmdList));
+		IM_ASSERT(SUCCEEDED(hr));
+
+		cmdList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, NULL);
+		cmdList->ResourceBarrier(1, &barrier);
+
+		hr = cmdList->Close();
+		IM_ASSERT(SUCCEEDED(hr));
+
+		// Execute the copy
+		cmdQueue->ExecuteCommandLists(1, (ID3D12CommandList* const*)&cmdList);
+		hr = cmdQueue->Signal(fence, 1);
+		IM_ASSERT(SUCCEEDED(hr));
+
+		// Wait for everything to complete
+		fence->SetEventOnCompletion(1, event);
+		WaitForSingleObject(event, INFINITE);
+
+		// Tear down our temporary command queue and release the upload resource
+		cmdList->Release();
+		cmdAlloc->Release();
+		cmdQueue->Release();
+		CloseHandle(event);
+		fence->Release();
+		uploadBuffer->Release();
+
+		// Create a shader resource view for the texture
+		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
+		ZeroMemory(&srvDesc, sizeof(srvDesc));
+		srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = desc.MipLevels;
+		srvDesc.Texture2D.MostDetailedMip = 0;
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		device->CreateShaderResourceView(pTexture, &srvDesc, textureData.cpuHandle);
+
+		// Return results
+		textureData.dx12Resource = pTexture;
+		textureData.width = image_width;
+		textureData.height = image_height;
+
+		return textureData;
+	}
+
 	void D3DRenderer::Overlay(IDXGISwapChain* pSwapChain)
 	{
 #ifdef _DEBUG
@@ -297,7 +515,7 @@ namespace ER
 			{
 				D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 				desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-				desc.NumDescriptors = 1;
+				desc.NumDescriptors = textureFileDataLoaded ? 9 : 1;
 				desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 				if (pDevice->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_DescriptorHeap)) != S_OK)
 				{
@@ -305,6 +523,15 @@ namespace ER
 					pSwapChain3->Release();
 					Logger::log("Failed to create descriptor heap type D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV", LogLevel::Warning);
 					return;
+				}
+
+				if (textureFileDataLoaded)
+				{
+					auto&& bossBarBorderTextureData = initD3D12Texture(bossBarBorderFileData, pDevice, m_DescriptorHeap, 2);
+					auto&& bossBarTextureData = initD3D12Texture(bossBarFileData, pDevice, m_DescriptorHeap, 3);
+					auto&& entityBarBorderTextureData = initD3D12Texture(entityBarBorderFileData, pDevice, m_DescriptorHeap, 4);
+					auto&& entityBarTextureData = initD3D12Texture(entityBarFileData, pDevice, m_DescriptorHeap, 5);
+
 				}
 			}
 			{
@@ -677,5 +904,9 @@ namespace ER
 	{
 		g_Running = false;
 		Unhook();
+		stbi_image_free(entityBarBorderFileData.data);
+		stbi_image_free(entityBarFileData.data);
+		stbi_image_free(bossBarBorderFileData.data);
+		stbi_image_free(bossBarFileData.data);
 	}
 }

@@ -21,6 +21,9 @@
     <Filter Include="Source Files\Ini">
       <UniqueIdentifier>{a1106453-cf7f-4c30-8971-5e4c020e7a7a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Stb">
+      <UniqueIdentifier>{83867c03-cce2-4b57-8328-3f4a226f5db8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\dllmain.cpp">
@@ -153,6 +156,9 @@
     </ClInclude>
     <ClInclude Include="Source\Ini\ini.h">
       <Filter>Source Files\Ini</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Stb\stb_image.h">
+      <Filter>Source Files\Stb</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

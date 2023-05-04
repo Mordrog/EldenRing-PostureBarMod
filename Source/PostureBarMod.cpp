@@ -26,6 +26,8 @@ bool loadIni()
         ScreenParams::autoPositionSetup = ini["General"].get("AutoPositionSetup") == "true";
         ScreenParams::autoGameToViewportScaling = ini["General"].get("AutoGameToScreenScaling") == "true";
 
+        TextureData::useTextures = ini["Textures"].get("UseTextures") == "true";
+
         BossPostureBarData::drawBars = ini["Boss Posture Bar"].get("DrawBars") == "true";
         BossPostureBarData::useStaminaForNPC = ini["Boss Posture Bar"].get("UseStaminaForNPC") == "true";
         BossPostureBarData::barWidth = std::stof(ini["Boss Posture Bar"].get("BarWidth"));
@@ -75,6 +77,8 @@ bool loadIni()
     Logger::log("\t\tGameToScreenScaling:" + std::to_string(ScreenParams::gameToViewportScaling));
     Logger::log("\t\tAutoPositionSetup:" + std::to_string(ScreenParams::autoPositionSetup));
     Logger::log("\t\tAutoGameToScreenScaling:" + std::to_string(ScreenParams::autoGameToViewportScaling));
+    Logger::log("\tTextures:");
+    Logger::log("\t\tUseTextures: " + std::to_string(TextureData::useTextures));
     Logger::log("\tBoss Posture Bar:");
     Logger::log("\t\tDrawBars: " + std::to_string(BossPostureBarData::drawBars));
     Logger::log("\t\tUseStaminaForNPC: " + std::to_string(BossPostureBarData::useStaminaForNPC));
@@ -165,6 +169,7 @@ void MainThread()
     std::this_thread::sleep_for(5s);
     Logger::log("Starting Main Thread");
     g_D3DRenderer = std::make_unique<D3DRenderer>();
+    g_D3DRenderer->loadBarTextures();
     g_postureUI = std::make_unique<PostureBarUI>();
     g_Hooking = std::make_unique<Hooking>();
     g_Hooking->Hook();

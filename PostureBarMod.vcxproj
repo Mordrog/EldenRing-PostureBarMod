@@ -64,6 +64,7 @@
     <ClInclude Include="Source\Minhook\table32.h" />
     <ClInclude Include="Source\Minhook\table64.h" />
     <ClInclude Include="Source\Minhook\trampoline.h" />
+    <ClInclude Include="Source\Stb\stb_image.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

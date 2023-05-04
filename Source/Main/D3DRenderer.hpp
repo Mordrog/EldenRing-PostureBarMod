@@ -3,6 +3,27 @@
 
 namespace ER
 {
+	struct TextureFileData
+	{
+		unsigned char* data = nullptr;
+		int width = 0;
+		int height = 0;
+
+		static inline std::string bossBarFile = "mods\\PostureBarResources\\BossBar.png";
+		static inline std::string bossBorderFile = "mods\\PostureBarResources\\BossBarBorder.png";
+		static inline std::string entityBarFile = "mods\\PostureBarResources\\EntityBar.png";
+		static inline std::string entityBorderFile = "mods\\PostureBarResources\\EntityBarBorder.png";
+	};
+
+	struct D3D12TextureData
+	{
+		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle{};
+		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle{};
+		ID3D12Resource* dx12Resource = nullptr;
+		int width = 0;
+		int height = 0;
+	};
+
 	class D3DRenderer
 	{
 		class ProgramData
@@ -64,6 +85,9 @@ namespace ER
 		static HRESULT APIENTRY HookResizeTarget(IDXGISwapChain* _this, const DXGI_MODE_DESC* pNewTargetParameters);
 		void ResetRenderState();
 
+		bool loadTextureFileData(const std::string& filename, TextureFileData* textureFileData);
+		void loadBarTextures();
+
 		bool InitHook();
 		bool Hook();
 		void Unhook();
@@ -90,6 +114,12 @@ namespace ER
 
 		IDXGISwapChain3* m_Swapchain{};
 		ID3D12Device* m_Device{};
+
+		TextureFileData entityBarFileData;
+		TextureFileData entityBarBorderFileData;
+		TextureFileData bossBarFileData;
+		TextureFileData bossBarBorderFileData;
+		bool textureFileDataLoaded = false;
 
 		ID3D12DescriptorHeap* m_DescriptorHeap{};
 		ID3D12DescriptorHeap* m_rtvDescriptorHeap{};
