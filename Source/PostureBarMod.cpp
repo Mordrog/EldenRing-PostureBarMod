@@ -28,6 +28,22 @@ bool loadIni()
 
         TextureData::useTextures = ini["Textures"].get("UseTextures") == "true";
 
+        auto&& staggerColorMax = splitString(ini["Style"].get("StaggerColorMax"), ",");
+        assert(staggerColorMax.size() == 4);
+        BarStyle::staggerMaxColor = ImVec4(std::stof(staggerColorMax[0]), std::stof(staggerColorMax[1]), std::stof(staggerColorMax[2]), std::stof(staggerColorMax[3]));
+
+        auto&& staggerColorMin = splitString(ini["Style"].get("StaggerColorMin"), ",");
+        assert(staggerColorMin.size() == 4);
+        BarStyle::staggerMinColor = ImVec4(std::stof(staggerColorMin[0]), std::stof(staggerColorMin[1]), std::stof(staggerColorMin[2]), std::stof(staggerColorMin[3]));
+
+        auto&& staminaColorMax = splitString(ini["Style"].get("StaminaColorMax"), ",");
+        assert(staminaColorMax.size() == 4);
+        BarStyle::staminaMaxColor = ImVec4(std::stof(staminaColorMax[0]), std::stof(staminaColorMax[1]), std::stof(staminaColorMax[2]), std::stof(staminaColorMax[3]));
+
+        auto&& staminaColorMin = splitString(ini["Style"].get("StaminaColorMin"), ",");
+        assert(staminaColorMin.size() == 4);
+        BarStyle::staminaMinColor = ImVec4(std::stof(staminaColorMin[0]), std::stof(staminaColorMin[1]), std::stof(staminaColorMin[2]), std::stof(staminaColorMin[3]));
+
         BossPostureBarData::drawBars = ini["Boss Posture Bar"].get("DrawBars") == "true";
         BossPostureBarData::useStaminaForNPC = ini["Boss Posture Bar"].get("UseStaminaForNPC") == "true";
         BossPostureBarData::barWidth = std::stof(ini["Boss Posture Bar"].get("BarWidth"));
@@ -79,6 +95,11 @@ bool loadIni()
     Logger::log("\t\tAutoGameToScreenScaling:" + std::to_string(ScreenParams::autoGameToViewportScaling));
     Logger::log("\tTextures:");
     Logger::log("\t\tUseTextures: " + std::to_string(TextureData::useTextures));
+    Logger::log("\tStyle:");
+    Logger::log("\t\tStaggerMaxColor: " + std::to_string(BarStyle::staggerMaxColor));
+    Logger::log("\t\tStaggerMinColor: " + std::to_string(BarStyle::staggerMinColor));
+    Logger::log("\t\tStaminaMaxColor: " + std::to_string(BarStyle::staminaMaxColor));
+    Logger::log("\t\tStaminaMinColor: " + std::to_string(BarStyle::staminaMinColor));
     Logger::log("\tBoss Posture Bar:");
     Logger::log("\t\tDrawBars: " + std::to_string(BossPostureBarData::drawBars));
     Logger::log("\t\tUseStaminaForNPC: " + std::to_string(BossPostureBarData::useStaminaForNPC));

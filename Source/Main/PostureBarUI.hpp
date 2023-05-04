@@ -78,6 +78,14 @@ namespace ER
 		static inline bool  autoGameToViewportScaling = true;
 	};
 
+	struct BarStyle
+	{
+		static inline ImVec4 staggerMaxColor = { 255, 255, 0, 255 };
+		static inline ImVec4 staggerMinColor = { 255, 255, 0, 255 };
+		static inline ImVec4 staminaMaxColor = { 80, 200, 104, 255 };
+		static inline ImVec4 staminaMinColor = { 80, 200, 104, 255 };
+	};
+
 	struct TextureData
 	{
 		static inline bool useTextures = true;
@@ -95,6 +103,7 @@ namespace ER
 
 		// Draws UI posture bars, use after starting imgui new frame
 		void Draw();
+		ImColor getBarColor(bool isStamina, float fillRatio);
 
 		// Hooked func on update of in game UI bars
 		static void updateUIBarStructs(uintptr_t moveMapStep, uintptr_t time);

@@ -57,6 +57,7 @@
 #include <unordered_map>
 #include <vector>
 #include <array>
+#include <regex>
 
 #include "Minhook/MinHook.h"
 #include "ImGui/imgui.h"
@@ -78,6 +79,32 @@ constexpr auto make_array(T value) -> std::array<T, N>
 		x = value;
 	return a;
 }
+
+inline std::vector<std::string> splitString(const std::string& inputString, const std::string& delimiter)
+{
+	std::regex re(delimiter);
+	std::sregex_token_iterator first{ inputString.begin(), inputString.end(), re, -1 }, last;//the '-1' is what makes the regex split (-1 := what was not matched)
+	return { first, last };
+}
+
+namespace std
+{
+	inline std::string to_string(const ImVec2& vec2)
+	{
+		return "(" + std::to_string(vec2.x) + ", " + std::to_string(vec2.y) + ")";
+	}
+
+	inline std::string to_string(const ImVec4& vec4)
+	{
+		return "(" + std::to_string(vec4.x) + ", " + std::to_string(vec4.y) + ", " + std::to_string(vec4.z) + ", " + std::to_string(vec4.w) + ")";
+	}
+
+	template<typename T>
+	inline std::string to_string(const std::pair<T, T> pair)
+	{
+		return "{ " + std::to_string(pair.first) + ", " + std::to_string(pair.second) + " }";
+	}
+};
 
 namespace ER {
 

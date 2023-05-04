@@ -226,6 +226,21 @@ namespace ER
                 }
     }
 
+    ImColor PostureBarUI::getBarColor(bool isStamina, float fillRatio)
+    {
+        const auto& colorFrom = !isStamina ? BarStyle::staggerMaxColor : BarStyle::staminaMaxColor;
+        const auto& colorTo = !isStamina ? BarStyle::staggerMinColor : BarStyle::staminaMinColor;
+
+        // so full stagger is "from", and empty is "to"
+        fillRatio = 1.0f - fillRatio;
+        int r = (int)std::lerp(colorFrom.x, colorTo.x, fillRatio);
+        int g = (int)std::lerp(colorFrom.y, colorTo.y, fillRatio);
+        int b = (int)std::lerp(colorFrom.z, colorTo.z, fillRatio);
+        int a = (int)std::lerp(colorFrom.w, colorTo.w, fillRatio);
+
+        return ImColor(r, g, b, a);
+    }
+
     void PostureBarUI::updateUIBarStructs(uintptr_t moveMapStep, uintptr_t time)
     {
         updateUIBarStructsOriginal(moveMapStep, time);
