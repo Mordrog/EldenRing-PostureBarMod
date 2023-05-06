@@ -117,6 +117,8 @@ namespace ER
 		void drawBar(const TextureBar& textureBar, const ImColor& color, const ImVec2& position, const ImVec2& size, const std::pair<ImVec2 /* top-left */, ImVec2 /* bot-right */>& fillOffset, float fillRatio);
 		void drawBar(const ImColor& color, const ImVec2& position, const ImVec2& size, float fillRatio);
 
+		bool isMenuOpen();
+
 		// Hooked func on update of in game UI bars
 		static void updateUIBarStructs(uintptr_t moveMapStep, uintptr_t time);
 		static inline void (*updateUIBarStructsOriginal)(uintptr_t, uintptr_t);

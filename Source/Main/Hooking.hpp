@@ -171,6 +171,8 @@ namespace ER
 		// Game found Signatures
 		uintptr_t worldChrSignature{};
 		uintptr_t CSFeManSignature{};
+		uintptr_t isLoading{};
+		uintptr_t menuState{};
 
 		// Static in game functions
 		typedef GameData::ChrIns* (*GetChrInsFromHandle)(GameData::WorldChrMan* worldChrMan, uint64_t* chrInsHandlePtr);

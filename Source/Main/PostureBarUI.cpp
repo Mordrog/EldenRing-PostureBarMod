@@ -101,6 +101,12 @@ namespace ER
             ImGui::GetBackgroundDrawList()->AddRect(ImVec2(ScreenParams::posX, ScreenParams::posY), ImVec2(ScreenParams::posX + adjustedViewportX, ScreenParams::posY + adjustedViewportY), ImColor(255, 255, 255,255), 0, 0, 1.0f);
         }
 
+        if (isMenuOpen())
+        {
+            Logger::log("Menu is open - not rendering bars", LogLevel::Debug);
+            return;
+        }
+
         if (BossPostureBarData::drawBars)
             for (IndexType i = 0; i < BOSS_CHR_ARRAY_LEN; i++)
                 if (auto bossPostureBar = bossPostureBars[i]; bossPostureBar && bossPostureBar->isVisible)
@@ -255,6 +261,15 @@ namespace ER
     void PostureBarUI::drawBar(const ImColor& color, const ImVec2& position, const ImVec2& size, float fillRatio)
     {
         ImGui::GetBackgroundDrawList()->AddRectFilled(position, position + size * ImVec2(fillRatio, 1.0f), color);
+    }
+
+    bool PostureBarUI::isMenuOpen()
+    {
+        auto isLoad = RPM<bool>(g_Hooking->isLoading);
+        auto menuState = RPM<uint8_t>(g_Hooking->menuState);
+
+        // 18 seems to be a "gameplay" state
+        return isLoad || menuState != 18;
     }
 
     void PostureBarUI::updateUIBarStructs(uintptr_t moveMapStep, uintptr_t time)
