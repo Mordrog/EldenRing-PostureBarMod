@@ -134,26 +134,23 @@ namespace ER
                         {
                             float timeRatio = 1.0f - bossPostureBar->resetStaggerTimer / BossPostureBarData::resetStaggerTotalTime;
 
-                            ImGui::GetBackgroundDrawList()->PushClipRect(ImVec2{ viewportPosition.x, viewportPosition.y }, ImVec2{ viewportPosition.x + timeRatio * width, viewportPosition.y + height });
+                            auto barColor = getBarColor(bossPostureBar->isStamina, staggerRatio);
 
-                            const auto color = ImColor(255, 255, 0, 255);
-                            ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2{ viewportPosition.x - 1.0f, viewportPosition.y - 1.0f }, ImVec2{ viewportPosition.x + width + 1.0f, viewportPosition.y + height + 1.0f }, ImColor(255, 255, 255, 255));
-                            ImGui::GetBackgroundDrawList()->AddRectFilled(viewportPosition, ImVec2{ viewportPosition.x + width, viewportPosition.y + height }, color);
+                            if (textureBarInit)
+                                drawBar(bossBarTexture, barColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, timeRatio);
+                            else
+                                drawBar(barColor, viewportPosition, ImVec2(width, height), timeRatio);
 
                             continue;
                         }
                     }
 
-                    ImGui::GetBackgroundDrawList()->PushClipRect(ImVec2{ viewportPosition.x, viewportPosition.y }, ImVec2{ viewportPosition.x + staggerRatio * width, viewportPosition.y + height });
+                    auto barColor = getBarColor(bossPostureBar->isStamina, staggerRatio);
 
-                    ImColor color;
-                    if (bossPostureBar->isStamina)
-                        color = ImColor(0, 200, 0, 255);
+                    if (textureBarInit)
+                        drawBar(bossBarTexture, barColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, staggerRatio);
                     else
-                        color = ImColor(255, (int)std::lerp(50, 255, staggerRatio), 0, 255);
-
-                    ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2{ viewportPosition.x - 1.0f, viewportPosition.y - 1.0f }, ImVec2{ viewportPosition.x + width + 1.0f, viewportPosition.y + height + 1.0f }, ImColor(255, 255, 255, 0));
-                    ImGui::GetBackgroundDrawList()->AddRectFilled(viewportPosition, ImVec2{ viewportPosition.x + width, viewportPosition.y + height }, color);
+                        drawBar(barColor, viewportPosition, ImVec2(width, height), staggerRatio);
                 }
 
         if (PostureBarData::drawBars)
@@ -202,27 +199,23 @@ namespace ER
                         {
                             float timeRatio = 1.0f - postureBar->resetStaggerTimer / PostureBarData::resetStaggerTotalTime;
 
-                            ImGui::GetBackgroundDrawList()->PushClipRect(ImVec2{ viewportPosition.x, viewportPosition.y }, ImVec2{ viewportPosition.x + timeRatio * width, viewportPosition.y + height });
+                            auto barColor = getBarColor(postureBar->isStamina, timeRatio);
 
-                            const auto color = ImColor(255, 255, 0, 255);
-                            ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2{ viewportPosition.x - 1.0f, viewportPosition.y - 1.0f }, ImVec2{ viewportPosition.x + width + 1.0f, viewportPosition.y + height + 1.0f }, ImColor(255, 255, 255, 255));
-                            ImGui::GetBackgroundDrawList()->AddRectFilled(viewportPosition, ImVec2{ viewportPosition.x + width, viewportPosition.y + height }, color);
+                            if (textureBarInit)
+                                drawBar(entityBarTexture, barColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, timeRatio);
+                            else
+                                drawBar(barColor, viewportPosition, ImVec2(width, height), timeRatio);
 
                             continue;
                         }
                     }
 
+                    auto barColor = getBarColor(postureBar->isStamina, staggerRatio);
 
-                    ImGui::GetBackgroundDrawList()->PushClipRect(ImVec2{ viewportPosition.x, viewportPosition.y }, ImVec2{ viewportPosition.x + staggerRatio * width, viewportPosition.y + height });
-
-                    ImColor color;
-                    if (postureBar->isStamina)
-                        color = ImColor(80, 200, 104, 255);
+                    if (textureBarInit)
+                        drawBar(entityBarTexture, barColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, staggerRatio);
                     else
-                        color = ImColor(255, (int)std::lerp(50, 255, staggerRatio), 0, 255);
-
-                    ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2{ viewportPosition.x - 1.0f, viewportPosition.y - 1.0f }, ImVec2{ viewportPosition.x + width + 1.0f, viewportPosition.y + height + 1.0f }, ImColor(255, 255, 255, 0));
-                    ImGui::GetBackgroundDrawList()->AddRectFilled(viewportPosition, ImVec2{ viewportPosition.x + width, viewportPosition.y + height }, color);
+                        drawBar(barColor, viewportPosition, ImVec2(width, height), staggerRatio);
                 }
     }
 
@@ -239,6 +232,29 @@ namespace ER
         int a = (int)std::lerp(colorFrom.w, colorTo.w, fillRatio);
 
         return ImColor(r, g, b, a);
+    }
+
+    void PostureBarUI::drawBar(const TextureBar& textureBar, const ImColor& color, const ImVec2& position, const ImVec2& size, const std::pair<ImVec2 /* top-left */, ImVec2 /* bot-right */>& fillOffset, float fillRatio)
+    {
+        auto&& [topLeftFillOffset, botRightFillOffset] = fillOffset;
+        auto&& [barTextureBorder, barTextureFill] = textureBar;
+        ImVec2 fillScale(size.x / (float)barTextureFill.width, size.y / (float)barTextureFill.height);
+        ImVec2 borderScale(size.x / (float)barTextureBorder.width, size.y / (float)barTextureBorder.height);
+
+        ImVec2 fillTopLeftScaled = topLeftFillOffset * fillScale;
+        ImVec2 fillBotRightScaled = (ImVec2((float)barTextureFill.width, (float)barTextureFill.height) + botRightFillOffset) * fillScale;
+
+        // Add Fill texture with clip to stagger ratio
+        ImGui::GetBackgroundDrawList()->PushClipRect(position + fillTopLeftScaled, position + fillBotRightScaled * ImVec2(fillRatio, 1.0f));
+        ImGui::GetBackgroundDrawList()->AddImage(barTextureFill.texture, position + fillTopLeftScaled, position + fillBotRightScaled, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), color);
+        ImGui::GetBackgroundDrawList()->PopClipRect();
+        // Add Border texture
+        ImGui::GetBackgroundDrawList()->AddImage(barTextureBorder.texture, position, position + ImVec2((float)barTextureBorder.width, (float)barTextureBorder.height) * borderScale);
+    }
+
+    void PostureBarUI::drawBar(const ImColor& color, const ImVec2& position, const ImVec2& size, float fillRatio)
+    {
+        ImGui::GetBackgroundDrawList()->AddRectFilled(position, position + size * ImVec2(fillRatio, 1.0f), color);
     }
 
     void PostureBarUI::updateUIBarStructs(uintptr_t moveMapStep, uintptr_t time)

@@ -532,6 +532,16 @@ namespace ER
 					auto&& entityBarBorderTextureData = initD3D12Texture(entityBarBorderFileData, pDevice, m_DescriptorHeap, 4);
 					auto&& entityBarTextureData = initD3D12Texture(entityBarFileData, pDevice, m_DescriptorHeap, 5);
 
+					g_postureUI->bossBarTexture = TextureBar(
+						TextureData((ImTextureID)bossBarBorderTextureData.gpuHandle.ptr, bossBarBorderTextureData.width, bossBarBorderTextureData.height), 
+						TextureData((ImTextureID)bossBarTextureData.gpuHandle.ptr, bossBarTextureData.width, bossBarTextureData.height)
+					);
+					
+					g_postureUI->entityBarTexture = TextureBar(
+						TextureData((ImTextureID)entityBarBorderTextureData.gpuHandle.ptr, entityBarBorderTextureData.width, entityBarBorderTextureData.height), 
+						TextureData((ImTextureID)entityBarTextureData.gpuHandle.ptr, entityBarTextureData.width, entityBarTextureData.height)
+					);
+					g_postureUI->textureBarInit = true;
 				}
 			}
 			{
@@ -865,6 +875,7 @@ namespace ER
 			ImGui_ImplWin32_Shutdown();
 			ImGui::DestroyContext();
 
+			g_postureUI->textureBarInit = false;
 			m_Init = false;
 		}
 	}

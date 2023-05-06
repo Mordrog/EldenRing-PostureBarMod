@@ -86,10 +86,20 @@ namespace ER
 		static inline ImVec4 staminaMinColor = { 80, 200, 104, 255 };
 	};
 
+	typedef std::pair<ImVec2 /* top-left */, ImVec2 /* bot-right*/> FillTextureOffset;
+
 	struct TextureData
 	{
+		ImTextureID texture = nullptr;
+		float width = 0.0f;
+		float height = 0.0f;
+
 		static inline bool useTextures = true;
+		static inline FillTextureOffset bossOffset = { {0.0f, 0.0f}, {0.0f, 0.0f} };
+		static inline FillTextureOffset entityOffset = { {0.0f, 0.0f}, {0.0f, 0.0f} };
 	};
+
+	typedef std::pair<TextureData /* border */, TextureData /* fill */> TextureBar;
 
 	class PostureBarUI
 	{
@@ -104,6 +114,8 @@ namespace ER
 		// Draws UI posture bars, use after starting imgui new frame
 		void Draw();
 		ImColor getBarColor(bool isStamina, float fillRatio);
+		void drawBar(const TextureBar& textureBar, const ImColor& color, const ImVec2& position, const ImVec2& size, const std::pair<ImVec2 /* top-left */, ImVec2 /* bot-right */>& fillOffset, float fillRatio);
+		void drawBar(const ImColor& color, const ImVec2& position, const ImVec2& size, float fillRatio);
 
 		// Hooked func on update of in game UI bars
 		static void updateUIBarStructs(uintptr_t moveMapStep, uintptr_t time);
@@ -111,6 +123,10 @@ namespace ER
 
 		std::array<std::optional<PostureBarData>, ENTITY_CHR_ARRAY_LEN> postureBars = make_array<std::optional<PostureBarData>, ENTITY_CHR_ARRAY_LEN>(std::nullopt);
 		std::array<std::optional<BossPostureBarData>, BOSS_CHR_ARRAY_LEN> bossPostureBars = make_array<std::optional<BossPostureBarData>, BOSS_CHR_ARRAY_LEN>(std::nullopt);
+
+		TextureBar entityBarTexture;
+		TextureBar bossBarTexture;
+		bool textureBarInit = false;
 	};
 
 	inline std::unique_ptr<PostureBarUI> g_postureUI;
