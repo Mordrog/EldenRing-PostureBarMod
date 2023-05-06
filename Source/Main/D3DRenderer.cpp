@@ -106,6 +106,7 @@ namespace ER
 		}
 
 		textureFileDataLoaded = true;
+		Logger::log("All texture files loaded successfully");
 	}
 
 	bool D3DRenderer::Hook()
@@ -515,6 +516,7 @@ namespace ER
 			{
 				D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 				desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+				// 1 + 8 from 4 textures (cpu + gpu handles)
 				desc.NumDescriptors = textureFileDataLoaded ? 9 : 1;
 				desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 				if (pDevice->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_DescriptorHeap)) != S_OK)
@@ -527,10 +529,19 @@ namespace ER
 
 				if (textureFileDataLoaded)
 				{
+					Logger::log("Init texture files into DirectX12");
 					auto&& bossBarBorderTextureData = initD3D12Texture(bossBarBorderFileData, pDevice, m_DescriptorHeap, 2);
 					auto&& bossBarTextureData = initD3D12Texture(bossBarFileData, pDevice, m_DescriptorHeap, 3);
 					auto&& entityBarBorderTextureData = initD3D12Texture(entityBarBorderFileData, pDevice, m_DescriptorHeap, 4);
 					auto&& entityBarTextureData = initD3D12Texture(entityBarFileData, pDevice, m_DescriptorHeap, 5);
+
+					if (!(bossBarBorderTextureData.dx12Resource && bossBarTextureData.dx12Resource && entityBarBorderTextureData.dx12Resource && entityBarTextureData.dx12Resource))
+					{
+						pDevice->Release();
+						pSwapChain3->Release();
+						Logger::log("Failed to init textures into DirectX12", LogLevel::Warning);
+						return;
+					}
 
 					g_postureUI->bossBarTexture = TextureBar(
 						TextureData((ImTextureID)bossBarBorderTextureData.gpuHandle.ptr, bossBarBorderTextureData.width, bossBarBorderTextureData.height), 
@@ -542,6 +553,7 @@ namespace ER
 						TextureData((ImTextureID)entityBarTextureData.gpuHandle.ptr, entityBarTextureData.width, entityBarTextureData.height)
 					);
 					g_postureUI->textureBarInit = true;
+					Logger::log("All texture init successfully");
 				}
 			}
 			{
@@ -663,6 +675,7 @@ namespace ER
 		ImGui::EndFrame();
 
 		UINT bufferIndex = pSwapChain3->GetCurrentBackBufferIndex();
+		Logger::log("ImGui swap chain buffer index: " + std::to_string(bufferIndex), LogLevel::Debug);
 
 		D3D12_RESOURCE_BARRIER barrier = {};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;

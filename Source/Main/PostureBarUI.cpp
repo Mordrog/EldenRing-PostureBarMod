@@ -72,9 +72,9 @@ namespace ER
                     using enum EDebugTestState;
 
                 case BossBarOffset:
-                    return std::tuple{ "Boss bar offset", BossPostureBarData::firstBossScreenX, BossPostureBarData::firstBossScreenY };
+                    return std::tuple{ "Boss bar screen offset", BossPostureBarData::firstBossScreenX, BossPostureBarData::firstBossScreenY };
                 case EntityBarOffset:
-                    return std::tuple{ "Entity bar offset", PostureBarData::offsetScreenX, PostureBarData::offsetScreenY };
+                    return std::tuple{ "Entity bar screen offset", PostureBarData::offsetScreenX, PostureBarData::offsetScreenY };
                 case GameScreenOffset:
                     return std::tuple{ "Screen offset (white border should match game viewport)", ScreenParams::posX, ScreenParams::posY };
                 case PosFixingMultiplier:
