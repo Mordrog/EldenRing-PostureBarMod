@@ -18,10 +18,10 @@ namespace ER
 
 	void Hooking::Hook()
 	{
-#ifdef _DEBUG
+#ifdef DEBUGLOG
 		try
 		{
-#endif // _DEBUG
+#endif // DEBUGLOG
 			Logger::log("Start Hooking");
 			g_D3DRenderer->Hook();
 
@@ -56,7 +56,7 @@ namespace ER
 				Logger::log("Failed to hook UpdateUIBarStructsFunc", LogLevel::Error);
 
 			MH_EnableHook(MH_ALL_HOOKS);
-#ifdef _DEBUG
+#ifdef DEBUGLOG
 		}
 		catch (const std::exception& e)
 		{
@@ -70,7 +70,7 @@ namespace ER
 			Logger::log("Unknown exception during Hooking::Hook", LogLevel::Error);
 			throw;
 		}
-#endif // _DEBUG
+#endif // DEBUGLOG
 	}
 
 	void Hooking::Unhook()

@@ -30,10 +30,10 @@ namespace ER
 
 	void Logger::log(const std::string_view& msg, LogLevel logLevel, const std::source_location& location)
 	{
-#ifdef NDEBUG
+#ifndef DEBUGLOG
 		if (logLevel == LogLevel::Debug)
 			return;
-#endif // _DEBUG
+#endif // DEBUGLOG
 
 		if (!useLogger)
 			return;

@@ -135,10 +135,10 @@ namespace ER
 
     bool D3DRenderer::InitHook()
     {
-#ifdef _DEBUG
+#ifdef DEBUGLOG
 		try
 		{
-#endif // _DEBUG
+#endif // DEBUGLOG
 		Logger::log("Init D3DWindow");
 		if (!InitWindow()) 
 		{
@@ -291,7 +291,7 @@ namespace ER
 		SwapChain->Release();
 		SwapChain = NULL;
 		DeleteWindow();
-#ifdef _DEBUG
+#ifdef DEBUGLOG
 		}
 		catch (const std::exception& e)
 		{
@@ -305,7 +305,7 @@ namespace ER
 			Logger::log("Unknown exception during D3DRenderer::InitHook", LogLevel::Error);
 			throw;
 		}
-#endif // _DEBUG
+#endif // DEBUGLOG
 		return true;
     }
 
@@ -478,10 +478,10 @@ namespace ER
 
 	void D3DRenderer::Overlay(IDXGISwapChain* pSwapChain)
 	{
-#ifdef _DEBUG
+#ifdef DEBUGLOG
 		try
 		{
-#endif // _DEBUG
+#endif // DEBUGLOG
 		if (m_CommandQueue == nullptr)
 			return;
 
@@ -693,7 +693,7 @@ namespace ER
 		Logger::log("IDXGISwapChain3 release", LogLevel::Debug);
 		pSwapChain3->Release();
 
-#ifdef _DEBUG
+#ifdef DEBUGLOG
 		}
 		catch (const std::exception& e)
 		{
@@ -707,7 +707,7 @@ namespace ER
 			Logger::log("Unknown exception during D3DRenderer::Overlay", LogLevel::Error);
 			throw;
 		}
-#endif // _DEBUG
+#endif // DEBUGLOG
 	}
 
 	HRESULT APIENTRY D3DRenderer::HookResizeTarget(IDXGISwapChain* _this, const DXGI_MODE_DESC* pNewTargetParameters)

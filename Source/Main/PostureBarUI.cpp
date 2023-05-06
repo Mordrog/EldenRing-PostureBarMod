@@ -275,10 +275,10 @@ namespace ER
     void PostureBarUI::updateUIBarStructs(uintptr_t moveMapStep, uintptr_t time)
     {
         updateUIBarStructsOriginal(moveMapStep, time);
-#ifdef _DEBUG
+#ifdef DEBUGLOG
         try
         {
-#endif // _DEBUG
+#endif // DEBUGLOG
         Logger::log("Entered updateUIBarStructs", LogLevel::Debug);
 
         auto&& worldChar = (GameData::WorldChrMan*)RPM<uintptr_t>(g_Hooking->worldChrSignature);
@@ -400,7 +400,7 @@ namespace ER
                 g_postureUI->postureBars[i] = std::nullopt;
             }
 
-#ifdef _DEBUG
+#ifdef DEBUGLOG
         }
         catch (const std::exception& e)
         {
@@ -414,6 +414,6 @@ namespace ER
             Logger::log("Unknown exception during PostureBarUI::updateUIBarStructs", LogLevel::Error);
             throw;
         }
-#endif // _DEBUG
+#endif // DEBUGLOG
     }
 }
