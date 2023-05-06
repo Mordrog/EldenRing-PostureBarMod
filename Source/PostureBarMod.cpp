@@ -18,6 +18,9 @@ bool loadIni()
         if (!config.read(ini))
             throw std::exception("Failed to read PostureModConfig.ini in mods folder");
 
+        //-----------------------------------------------------------------------------------
+        //									    General
+        //-----------------------------------------------------------------------------------
         ScreenParams::inGameCoordSizeX = std::stof(ini["General"].get("InGameScreenCoordWidth"));
         ScreenParams::inGameCoordSizeY = std::stof(ini["General"].get("InGameScreenCoordHeight"));
         ScreenParams::posX = std::stof(ini["General"].get("ScreenPositionX"));
@@ -26,8 +29,26 @@ bool loadIni()
         ScreenParams::autoPositionSetup = ini["General"].get("AutoPositionSetup") == "true";
         ScreenParams::autoGameToViewportScaling = ini["General"].get("AutoGameToScreenScaling") == "true";
 
+        //-----------------------------------------------------------------------------------
+        //									    Textures
+        //-----------------------------------------------------------------------------------
         TextureData::useTextures = ini["Textures"].get("UseTextures") == "true";
+        TextureFileData::bossBarFile = ini["Textures"].get("BossBarFillFile");
+        TextureFileData::bossBorderFile = ini["Textures"].get("BossBarBorderFile");
+        TextureFileData::entityBarFile = ini["Textures"].get("EntityBarFillFile");
+        TextureFileData::entityBorderFile = ini["Textures"].get("EntityBarBorderFile");
+        TextureData::bossOffset = FillTextureOffset{
+            { std::stof(ini["Textures"].get("BossFillTopLeftOffsetX")), std::stof(ini["Textures"].get("BossFillTopLeftOffsetY")) },
+            { std::stof(ini["Textures"].get("BossFillBotRightOffsetX")), std::stof(ini["Textures"].get("BossFillBotRightOffsetY")) }
+        };
+        TextureData::entityOffset = FillTextureOffset{
+            { std::stof(ini["Textures"].get("EntityFillTopLeftOffsetX")), std::stof(ini["Textures"].get("EntityFillTopLeftOffsetY")) },
+            { std::stof(ini["Textures"].get("EntityFillBotRightOffsetX")), std::stof(ini["Textures"].get("EntityFillBotRightOffsetY")) }
+        };
 
+        //-----------------------------------------------------------------------------------
+        //									    Style
+        //-----------------------------------------------------------------------------------
         auto&& staggerColorMax = splitString(ini["Style"].get("StaggerColorMax"), ",");
         assert(staggerColorMax.size() == 4);
         BarStyle::staggerMaxColor = ImVec4(std::stof(staggerColorMax[0]), std::stof(staggerColorMax[1]), std::stof(staggerColorMax[2]), std::stof(staggerColorMax[3]));
@@ -44,6 +65,9 @@ bool loadIni()
         assert(staminaColorMin.size() == 4);
         BarStyle::staminaMinColor = ImVec4(std::stof(staminaColorMin[0]), std::stof(staminaColorMin[1]), std::stof(staminaColorMin[2]), std::stof(staminaColorMin[3]));
 
+        //-----------------------------------------------------------------------------------
+        //									    Boss Posture Bar
+        //-----------------------------------------------------------------------------------
         BossPostureBarData::drawBars = ini["Boss Posture Bar"].get("DrawBars") == "true";
         BossPostureBarData::useStaminaForNPC = ini["Boss Posture Bar"].get("UseStaminaForNPC") == "true";
         BossPostureBarData::barWidth = std::stof(ini["Boss Posture Bar"].get("BarWidth"));
@@ -53,6 +77,9 @@ bool loadIni()
         BossPostureBarData::firstBossScreenY = std::stof(ini["Boss Posture Bar"].get("FirstBossScreenY"));
         BossPostureBarData::nextBossBarDiffScreenY = std::stof(ini["Boss Posture Bar"].get("NextBossBarDiffScreenY"));
 
+        //-----------------------------------------------------------------------------------
+        //									    Entity Posture Bar
+        //-----------------------------------------------------------------------------------
         PostureBarData::drawBars = ini["Entity Posture Bar"].get("DrawBars") == "true";
         PostureBarData::useStaminaForNPC = ini["Entity Posture Bar"].get("UseStaminaForNPC") == "true";
         PostureBarData::barWidth = std::stof(ini["Entity Posture Bar"].get("BarWidth"));
@@ -68,19 +95,22 @@ bool loadIni()
         PostureBarData::positionFixingMultiplierX = std::stof(ini["Entity Posture Bar"].get("PositionFixingMultiplierX"));
         PostureBarData::positionFixingMultiplierY = std::stof(ini["Entity Posture Bar"].get("PositionFixingMultiplierY"));
 
+        //-----------------------------------------------------------------------------------
+        //									    Debug
+        //-----------------------------------------------------------------------------------
         Logger::useLogger = ini["Debug"].get("Log") == "true";
         offsetTesting = ini["Debug"].get("OffsetTest") == "true";
     }
     catch(const std::exception& e)
     {
         Logger::useLogger = true;
-        Logger::log(e.what());
+        Logger::log(e.what(), LogLevel::Error);
         return false;
     }
     catch (...) 
     {
         Logger::useLogger = true;
-        Logger::log("Unknown exception during loading of PostureBarModConfig.ini");
+        Logger::log("Unknown exception during loading of PostureBarModConfig.ini", LogLevel::Error);
         return false;
     }
 
@@ -90,11 +120,17 @@ bool loadIni()
     Logger::log("\t\tInGameScreenCoordHeight: " + std::to_string(ScreenParams::inGameCoordSizeY));
     Logger::log("\t\tScreenPositionX: " + std::to_string(ScreenParams::posX));
     Logger::log("\t\tScreenPositionY: " + std::to_string(ScreenParams::posY));
-    Logger::log("\t\tGameToScreenScaling:" + std::to_string(ScreenParams::gameToViewportScaling));
-    Logger::log("\t\tAutoPositionSetup:" + std::to_string(ScreenParams::autoPositionSetup));
-    Logger::log("\t\tAutoGameToScreenScaling:" + std::to_string(ScreenParams::autoGameToViewportScaling));
+    Logger::log("\t\tGameToScreenScaling: " + std::to_string(ScreenParams::gameToViewportScaling));
+    Logger::log("\t\tAutoPositionSetup: " + std::to_string(ScreenParams::autoPositionSetup));
+    Logger::log("\t\tAutoGameToScreenScaling: " + std::to_string(ScreenParams::autoGameToViewportScaling));
     Logger::log("\tTextures:");
     Logger::log("\t\tUseTextures: " + std::to_string(TextureData::useTextures));
+    Logger::log("\t\tBossBarFile: " + TextureFileData::bossBarFile);
+    Logger::log("\t\tBossBorderFile: " + TextureFileData::bossBorderFile);
+    Logger::log("\t\tEntityBarFile: " + TextureFileData::entityBarFile);
+    Logger::log("\t\tEntityBorderFile: " + TextureFileData::entityBorderFile);
+    Logger::log("\t\tBossFillOffset: " + std::to_string(TextureData::bossOffset));
+    Logger::log("\t\tEntityFillOffset: " + std::to_string(TextureData::entityOffset));
     Logger::log("\tStyle:");
     Logger::log("\t\tStaggerMaxColor: " + std::to_string(BarStyle::staggerMaxColor));
     Logger::log("\t\tStaggerMinColor: " + std::to_string(BarStyle::staggerMinColor));
