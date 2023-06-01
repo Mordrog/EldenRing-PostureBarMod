@@ -1,4 +1,5 @@
 ﻿#include "Logger.hpp"
+#include "../PostureBarMod.hpp"
 
 namespace ER 
 {
@@ -40,7 +41,7 @@ namespace ER
 
 		std::scoped_lock lock(loggerMutex);
 		if (!logFile.is_open())
-			logFile.open(logFileName, std::ifstream::out);
+			logFile.open(dllPath + logFileName, std::ifstream::out);
 
 		if (logFile.good())
 		{

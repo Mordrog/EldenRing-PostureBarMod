@@ -15,7 +15,7 @@ namespace ER
 	class Logger 
 	{
 	public:
-		static inline const char* logFileName = "mods\\PostureModLog.txt";
+		static inline const std::string logFileName = "PostureModLog.txt";
 		static inline std::ofstream logFile;
 
 		explicit Logger() = delete;

@@ -12,7 +12,7 @@ bool loadIni()
     try
     {
         using namespace mINI;
-        INIFile config("mods\\PostureBarModConfig.ini");
+        INIFile config(dllPath + "PostureBarModConfig.ini");
         INIStructure ini;
 
         if (!config.read(ini))
@@ -33,10 +33,10 @@ bool loadIni()
         //									    Textures
         //-----------------------------------------------------------------------------------
         TextureData::useTextures = ini["Textures"].get("UseTextures") == "true";
-        TextureFileData::bossBarFile = ini["Textures"].get("BossBarFillFile");
-        TextureFileData::bossBorderFile = ini["Textures"].get("BossBarBorderFile");
-        TextureFileData::entityBarFile = ini["Textures"].get("EntityBarFillFile");
-        TextureFileData::entityBorderFile = ini["Textures"].get("EntityBarBorderFile");
+        TextureFileData::bossBarFile = dllPath + ini["Textures"].get("BossBarFillFile");
+        TextureFileData::bossBorderFile = dllPath + ini["Textures"].get("BossBarBorderFile");
+        TextureFileData::entityBarFile = dllPath + ini["Textures"].get("EntityBarFillFile");
+        TextureFileData::entityBorderFile = dllPath + ini["Textures"].get("EntityBarBorderFile");
         TextureData::bossOffset = FillTextureOffset{
             { std::stof(ini["Textures"].get("BossFillTopLeftOffsetX")), std::stof(ini["Textures"].get("BossFillTopLeftOffsetY")) },
             { std::stof(ini["Textures"].get("BossFillBotRightOffsetX")), std::stof(ini["Textures"].get("BossFillBotRightOffsetY")) }
@@ -119,6 +119,7 @@ bool loadIni()
         return false;
     }
 
+    Logger::log("Dll path: " + dllPath);
     Logger::log("Loaded ini settings: ");
     Logger::log("\tGeneral:");
     Logger::log("\t\tInGameScreenCoordWidth: " + std::to_string(ScreenParams::inGameCoordSizeX));
@@ -179,7 +180,7 @@ bool saveTestOffsetToIni()
     try
     {
         using namespace mINI;
-        INIFile config("mods\\PostureBarModConfig.ini");
+        INIFile config(dllPath + "mods\\PostureBarModConfig.ini");
         INIStructure ini;
 
         if (!config.read(ini))
@@ -225,8 +226,55 @@ bool saveTestOffsetToIni()
     return true;
 }
 
+bool findDllPath()
+{
+    try
+    {
+        char path[MAX_PATH];
+        HMODULE moduleHandle = NULL;
+
+        // Get the handle to this module (the current DLL)
+        if (!GetModuleHandleExA(
+            GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+            GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+            reinterpret_cast<LPCSTR>(&findDllPath),
+            &moduleHandle))
+            throw std::exception("Failed to find dll module handle");
+
+        // Get the path of the current DLL
+        if (!GetModuleFileNameA(moduleHandle, path, sizeof(path)))
+            throw std::exception("Failed to get module name");
+
+        dllPath = path;
+
+        size_t lastBackslashPos = dllPath.find_last_of("\\");
+        if (lastBackslashPos != std::string::npos)
+        {
+            // Remove the file name from the path
+            dllPath.erase(lastBackslashPos + 1);
+        }
+    }
+    catch (const std::exception& e)
+    {
+        Logger::useLogger = true;
+        Logger::log(e.what());
+        return false;
+    }
+    catch (...)
+    {
+        Logger::useLogger = true;
+        Logger::log("Unknown exception during finding dll module");
+        return false;
+    }
+
+    return true;
+}
+
 void MainThread()
 {
+    if (!findDllPath())
+        return;
+
     if (!loadIni())
         return;
 

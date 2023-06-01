@@ -9,10 +9,10 @@ namespace ER
 		int width = 0;
 		int height = 0;
 
-		static inline std::string bossBarFile = "mods\\PostureBarResources\\BossBar.png";
-		static inline std::string bossBorderFile = "mods\\PostureBarResources\\BossBarBorder.png";
-		static inline std::string entityBarFile = "mods\\PostureBarResources\\EntityBar.png";
-		static inline std::string entityBorderFile = "mods\\PostureBarResources\\EntityBarBorder.png";
+		static inline std::string bossBarFile = "PostureBarResources\\BossBar.png";
+		static inline std::string bossBorderFile = "PostureBarResources\\BossBarBorder.png";
+		static inline std::string entityBarFile = "PostureBarResources\\EntityBar.png";
+		static inline std::string entityBorderFile = "PostureBarResources\\EntityBarBorder.png";
 	};
 
 	struct D3D12TextureData
