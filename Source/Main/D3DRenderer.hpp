@@ -46,15 +46,6 @@ namespace ER
 			LPCSTR m_ClassName;
 			LPCSTR m_GamePath;
 			uintptr_t m_ModuleBase;		// OBTAIN MODULE BASE
-			IDXGISwapChain3* m_Swapchain{};
-		};
-
-
-		struct _FrameContext 
-		{
-			ID3D12CommandAllocator* CommandAllocator;
-			ID3D12Resource* Resource;
-			D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHandle;
 		};
 
 		typedef HRESULT(APIENTRY* Present12) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
@@ -78,16 +69,17 @@ namespace ER
 		bool m_Init = false;
 
 
-		bool Init(IDXGISwapChain3* swapChain);
+		void Overlay(IDXGISwapChain* pSwapChain);
 
 		static HRESULT APIENTRY HookPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 		static void HookExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists, ID3D12CommandList* ppCommandLists);
 		static HRESULT APIENTRY HookResizeTarget(IDXGISwapChain* _this, const DXGI_MODE_DESC* pNewTargetParameters);
-		void ResetRenderState();
+		void ResetRenderState(IDXGISwapChain3* swapChain = nullptr);
 
 		bool loadTextureFileData(const std::string& filename, TextureFileData* textureFileData);
 		void loadBarTextures();
 
+		void EnableDebugLayer();
 		bool InitHook();
 		bool Hook();
 		void Unhook();
@@ -98,8 +90,6 @@ namespace ER
 		bool CreateHook(uint16_t Index, void** Original, void* Function);
 		void DisableHook(uint16_t Index);
 		void DisableAll();
-
-		void Overlay(IDXGISwapChain* pSwapChain);
 
 		static LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -121,16 +111,17 @@ namespace ER
 		TextureFileData bossBarBorderFileData;
 		bool textureFileDataLoaded = false;
 
-		ID3D12DescriptorHeap* m_DescriptorHeap{};
+		ID3D12DescriptorHeap* m_srvDescriptorHeap{};
 		ID3D12DescriptorHeap* m_rtvDescriptorHeap{};
-		ID3D12CommandAllocator** m_CommandAllocator;
+		ID3D12CommandAllocator** m_CommandAllocators;
 		ID3D12GraphicsCommandList* m_CommandList{};
 		ID3D12CommandQueue* m_CommandQueue{};
-		ID3D12Resource** m_BackBuffer;
+		ID3D12Resource** m_BackBuffers;
 		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> m_RenderTargets;
 
 		uint64_t m_BuffersCounts = -1;
-		_FrameContext* m_FrameContext{};
+		// 1 + number_of_textures * 2(cpu + gpu handles)
+		static inline const int srvDescriptorsNumWithTextures = 9;
 	};
 
 	inline std::unique_ptr<D3DRenderer> g_D3DRenderer;

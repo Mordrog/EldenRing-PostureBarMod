@@ -1,6 +1,6 @@
+#include "D3DRenderer.hpp"
 #include "../PostureBarMod.hpp"
 #include "Logger.hpp"
-#include "D3DRenderer.hpp"
 #include "Hooking.hpp"
 #include "PostureBarUI.hpp"
 
@@ -11,19 +11,26 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARA
 
 namespace ER 
 {
+	HWND FindERWindow()
+	{
+		HWND window = FindWindowExW(NULL, NULL, L"ELDEN RING™", NULL);
+
+		if (window == NULL)
+		{
+			Logger::log("Failed to find \"ELDEN RING™\" window, trying to get via GetForegroundWindow", LogLevel::Warning);
+			window = GetForegroundWindow();
+		}
+
+		return window;
+	}
+
 	D3DRenderer::ProgramData::ProgramData()
 	{
 		Logger::log("Acquiring program data");
 
 		m_GamePid = GetCurrentProcessId();
 		m_GameHandle = GetCurrentProcess();
-		m_GameWindow = FindWindowExW(NULL, NULL, L"ELDEN RING™", NULL);
-		
-		if (m_GameWindow == NULL)
-		{
-			Logger::log("Failed to find \"ELDEN RING™\" window, trying to get via GetForegroundWindow", LogLevel::Warning);
-			m_GameWindow = GetForegroundWindow();
-		}
+		m_GameWindow = FindERWindow();
 
 		m_ModuleBase = (uintptr_t)GetModuleHandle(NULL);
 
@@ -134,6 +141,21 @@ namespace ER
 		DisableAll();
 	}
 
+	void D3DRenderer::EnableDebugLayer()
+	{
+#if defined(DEBUGLOG)
+			// Always enable the debug layer before doing anything DX12 related
+			// so all possible errors generated while creating DX12 objects
+			// are caught by the debug layer.
+			ID3D12Debug* debugInterface;
+			if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface))))
+			{
+				Logger::log("Enabled debug layer");
+				debugInterface->EnableDebugLayer();
+			}
+#endif
+	}
+
     bool D3DRenderer::InitHook()
     {
 #ifdef DEBUGLOG
@@ -168,7 +190,7 @@ namespace ER
 
 		Logger::log("Init DXGI factory");
 		IDXGIFactory* Factory;
-		if (((long(__stdcall*)(const IID&, void**))(CreateDXGIFactory))(__uuidof(IDXGIFactory), (void**)&Factory) < 0) 
+		if (((long(__stdcall*)(const IID&, void**))(CreateDXGIFactory))(IID_PPV_ARGS(&Factory)) < 0)
 		{
 			Logger::log("Failed to init DXGI factory", LogLevel::Error);
 			DeleteWindow();
@@ -195,7 +217,8 @@ namespace ER
 
 		Logger::log("Init ID3D12Device");
 		ID3D12Device* Device;
-		if (((long(__stdcall*)(IUnknown*, D3D_FEATURE_LEVEL, const IID&, void**))(D3D12CreateDevice))(Adapter, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), (void**)&Device) < 0) 
+		auto test = ((HRESULT(__stdcall*)(IUnknown*, D3D_FEATURE_LEVEL, const IID&, void**))(D3D12CreateDevice))(Adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&Device));
+		if (test < 0)
 		{
 			Logger::log("Failed to init ID3D12Device", LogLevel::Error);
 			DeleteWindow();
@@ -210,7 +233,7 @@ namespace ER
 
 		Logger::log("Init ID3D12Device command queue");
 		ID3D12CommandQueue* CommandQueue;
-		if (Device->CreateCommandQueue(&QueueDesc, __uuidof(ID3D12CommandQueue), (void**)&CommandQueue) < 0) 
+		if (Device->CreateCommandQueue(&QueueDesc, IID_PPV_ARGS(&CommandQueue)) < 0)
 		{
 			Logger::log("Failed to init ID3D12Device command queue", LogLevel::Error);
 			DeleteWindow();
@@ -219,7 +242,7 @@ namespace ER
 
 		Logger::log("Init ID3D12Device command allocator");
 		ID3D12CommandAllocator* CommandAllocator;
-		if (Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)&CommandAllocator) < 0) 
+		if (Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&CommandAllocator)) < 0)
 		{
 			Logger::log("Failed to init ID3D12Device command allocator", LogLevel::Error);
 			DeleteWindow();
@@ -228,7 +251,7 @@ namespace ER
 
 		Logger::log("Init ID3D12Device command list");
 		ID3D12GraphicsCommandList* CommandList;
-		if (Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, CommandAllocator, NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&CommandList) < 0) 
+		if (Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, CommandAllocator, NULL, IID_PPV_ARGS(&CommandList)) < 0)
 		{
 			Logger::log("Failed to init ID3D12Device command list", LogLevel::Error);
 			DeleteWindow();
@@ -509,9 +532,8 @@ namespace ER
 				return;
 			}
 
-			m_BuffersCounts = sc_desc.BufferCount;
-
 			m_RenderTargets.clear();
+			m_BuffersCounts = sc_desc.BufferCount;
 
 			{
 				D3D12_DESCRIPTOR_HEAP_DESC desc = {};
@@ -519,7 +541,7 @@ namespace ER
 				// 1 + 8 from 4 textures (cpu + gpu handles)
 				desc.NumDescriptors = textureFileDataLoaded ? 9 : 1;
 				desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-				if (pDevice->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_DescriptorHeap)) != S_OK)
+				if (pDevice->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_srvDescriptorHeap)) != S_OK)
 				{
 					pDevice->Release();
 					pSwapChain3->Release();
@@ -530,10 +552,10 @@ namespace ER
 				if (textureFileDataLoaded)
 				{
 					Logger::log("Init texture files into DirectX12");
-					auto&& bossBarBorderTextureData = initD3D12Texture(bossBarBorderFileData, pDevice, m_DescriptorHeap, 2);
-					auto&& bossBarTextureData = initD3D12Texture(bossBarFileData, pDevice, m_DescriptorHeap, 3);
-					auto&& entityBarBorderTextureData = initD3D12Texture(entityBarBorderFileData, pDevice, m_DescriptorHeap, 4);
-					auto&& entityBarTextureData = initD3D12Texture(entityBarFileData, pDevice, m_DescriptorHeap, 5);
+					auto&& bossBarBorderTextureData = initD3D12Texture(bossBarBorderFileData, pDevice, m_srvDescriptorHeap, 2);
+					auto&& bossBarTextureData = initD3D12Texture(bossBarFileData, pDevice, m_srvDescriptorHeap, 3);
+					auto&& entityBarBorderTextureData = initD3D12Texture(entityBarBorderFileData, pDevice, m_srvDescriptorHeap, 4);
+					auto&& entityBarTextureData = initD3D12Texture(entityBarFileData, pDevice, m_srvDescriptorHeap, 5);
 
 					if (!(bossBarBorderTextureData.dx12Resource && bossBarTextureData.dx12Resource && entityBarBorderTextureData.dx12Resource && entityBarTextureData.dx12Resource))
 					{
@@ -559,22 +581,22 @@ namespace ER
 			{
 				D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 				desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-				desc.NumDescriptors = m_BuffersCounts;
+				desc.NumDescriptors = sc_desc.BufferCount;
 				desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 				desc.NodeMask = 1;
 				if (pDevice->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_rtvDescriptorHeap)) != S_OK)
 				{
 					pDevice->Release();
 					pSwapChain3->Release();
-					m_DescriptorHeap->Release();
+					m_srvDescriptorHeap->Release();
 					Logger::log("Failed to create descriptor heap type D3D12_DESCRIPTOR_HEAP_TYPE_RTV", LogLevel::Warning);
 					return;
 				}
 
 				SIZE_T rtvDescriptorSize = pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 				D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-				m_CommandAllocator = new ID3D12CommandAllocator * [m_BuffersCounts];
-				for (int i = 0; i < m_BuffersCounts; ++i)
+				m_CommandAllocators = new ID3D12CommandAllocator * [sc_desc.BufferCount];
+				for (int i = 0; i < sc_desc.BufferCount; ++i)
 				{
 					m_RenderTargets.push_back(rtvHandle);
 					rtvHandle.ptr += rtvDescriptorSize;
@@ -583,41 +605,41 @@ namespace ER
 
 			for (UINT i = 0; i < sc_desc.BufferCount; ++i)
 			{
-				if (pDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_CommandAllocator[i])) != S_OK)
+				if (pDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_CommandAllocators[i])) != S_OK)
 				{
 					pDevice->Release();
 					pSwapChain3->Release();
-					m_DescriptorHeap->Release();
+					m_srvDescriptorHeap->Release();
 					for (UINT j = 0; j < i; ++j)
 					{
-						m_CommandAllocator[j]->Release();
+						m_CommandAllocators[j]->Release();
 					}
 					m_rtvDescriptorHeap->Release();
-					delete[]m_CommandAllocator;
+					delete[]m_CommandAllocators;
 					Logger::log("Failed to create command allocator D3D12_COMMAND_LIST_TYPE_DIRECT buffer idx: " + std::to_string(i), LogLevel::Warning);
 					return;
 				}
 			}
 
-			if (pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_CommandAllocator[0], NULL, IID_PPV_ARGS(&m_CommandList)) != S_OK ||
+			if (pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_CommandAllocators[0], NULL, IID_PPV_ARGS(&m_CommandList)) != S_OK ||
 				m_CommandList->Close() != S_OK)
 			{
 				pDevice->Release();
 				pSwapChain3->Release();
-				m_DescriptorHeap->Release();
-				for (UINT i = 0; i < m_BuffersCounts; ++i)
-					m_CommandAllocator[i]->Release();
+				m_srvDescriptorHeap->Release();
+				for (UINT i = 0; i < sc_desc.BufferCount; ++i)
+					m_CommandAllocators[i]->Release();
 				m_rtvDescriptorHeap->Release();
-				delete[]m_CommandAllocator;
+				delete[]m_CommandAllocators;
 				Logger::log("Failed to create command list D3D12_COMMAND_LIST_TYPE_DIRECT", LogLevel::Warning);
 				return;
 			}
 
-			m_BackBuffer = new ID3D12Resource * [m_BuffersCounts];
-			for (UINT i = 0; i < m_BuffersCounts; i++)
+			m_BackBuffers = new ID3D12Resource * [sc_desc.BufferCount];
+			for (UINT i = 0; i < sc_desc.BufferCount; i++)
 			{
-				pSwapChain3->GetBuffer(i, IID_PPV_ARGS(&m_BackBuffer[i]));
-				pDevice->CreateRenderTargetView(m_BackBuffer[i], NULL, m_RenderTargets[i]);
+				pSwapChain3->GetBuffer(i, IID_PPV_ARGS(&m_BackBuffers[i]));
+				pDevice->CreateRenderTargetView(m_BackBuffers[i], NULL, m_RenderTargets[i]);
 			}
 
 			Logger::log("ImGui CreateContext");
@@ -625,12 +647,7 @@ namespace ER
 			ImGuiIO& io = ImGui::GetIO();
 			io.IniFilename = NULL;
 
-			programData->m_GameWindow = FindWindowExW(NULL, NULL, L"ELDEN RING™", NULL);
-			if (programData->m_GameWindow == NULL)
-			{
-				Logger::log("Failed to find \"ELDEN RING™\" window, trying to get via GetForegroundWindow", LogLevel::Warning);
-				programData->m_GameWindow = GetForegroundWindow();
-			}
+			programData->m_GameWindow = FindERWindow();
 
 			Logger::log("Init ImGui for found window");
 			if (!ImGui_ImplWin32_Init(programData->m_GameWindow))
@@ -640,7 +657,7 @@ namespace ER
 			}
 
 			Logger::log("Init ImGui for DX12");
-			if (!ImGui_ImplDX12_Init(pDevice, m_BuffersCounts, DXGI_FORMAT_R8G8B8A8_UNORM, NULL, m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart()))
+			if (!ImGui_ImplDX12_Init(pDevice, sc_desc.BufferCount, DXGI_FORMAT_R8G8B8A8_UNORM, NULL, m_srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart()))
 			{
 				Logger::log("Failed to init ImGui for DX12", LogLevel::Warning);
 				return;
@@ -680,16 +697,16 @@ namespace ER
 		D3D12_RESOURCE_BARRIER barrier = {};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		barrier.Transition.pResource = m_BackBuffer[bufferIndex];
+		barrier.Transition.pResource = m_BackBuffers[bufferIndex];
 		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 
-		m_CommandAllocator[bufferIndex]->Reset();
-		m_CommandList->Reset(m_CommandAllocator[bufferIndex], NULL);
+		m_CommandAllocators[bufferIndex]->Reset();
+		m_CommandList->Reset(m_CommandAllocators[bufferIndex], NULL);
 		m_CommandList->ResourceBarrier(1, &barrier);
 		m_CommandList->OMSetRenderTargets(1, &m_RenderTargets[bufferIndex], FALSE, NULL);
-		m_CommandList->SetDescriptorHeaps(1, &m_DescriptorHeap);
+		m_CommandList->SetDescriptorHeaps(1, &m_srvDescriptorHeap);
 
 		Logger::log("ImGui render", LogLevel::Debug);
 		ImGui::Render();
@@ -723,19 +740,22 @@ namespace ER
 #endif // DEBUGLOG
 	}
 
-	HRESULT APIENTRY D3DRenderer::HookResizeTarget(IDXGISwapChain* _this, const DXGI_MODE_DESC* pNewTargetParameters)
-	{
-		Logger::log("Enter HookResizeTarget", LogLevel::Debug);
-		g_D3DRenderer->ResetRenderState();
-		return g_D3DRenderer->oResizeTarget(_this, pNewTargetParameters);
-	}
-
 	LRESULT D3DRenderer::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (ImGui::GetCurrentContext())
 			ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 
 		return CallWindowProc((WNDPROC)g_D3DRenderer->m_OldWndProc, hWnd, msg, wParam, lParam);
+	}
+
+	HRESULT APIENTRY D3DRenderer::HookResizeTarget(IDXGISwapChain* _this, const DXGI_MODE_DESC* pNewTargetParameters)
+	{
+		Logger::log("Enter HookResizeTarget", LogLevel::Debug);
+
+		if (g_D3DRenderer->m_Init)
+			g_D3DRenderer->ResetRenderState();
+
+		return g_D3DRenderer->oResizeTarget(_this, pNewTargetParameters);
 	}
 
     HRESULT APIENTRY D3DRenderer::HookPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
@@ -763,86 +783,40 @@ namespace ER
 		g_D3DRenderer->oExecuteCommandLists(queue, NumCommandLists, ppCommandLists);
 	}
 
-	bool D3DRenderer::Init(IDXGISwapChain3* swapChain)
+	void D3DRenderer::ResetRenderState(IDXGISwapChain3* swapChain /*= nullptr*/)
 	{
-		m_Swapchain = swapChain;
-		if (SUCCEEDED(m_Swapchain->GetDevice(__uuidof(ID3D12Device), (void**)&m_Device))) {
-			ImGui::CreateContext();
+		if (swapChain)
+			swapChain->Release();
 
-			ImGuiIO& io = ImGui::GetIO(); (void)io;
-			ImGui::GetIO().WantCaptureMouse || ImGui::GetIO().WantTextInput || ImGui::GetIO().WantCaptureKeyboard;
-			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-			io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-			io.IniFilename = NULL;
-
-			DXGI_SWAP_CHAIN_DESC Desc;
-			m_Swapchain->GetDesc(&Desc);
-			Desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-			Desc.OutputWindow = programData->m_GameWindow;
-			Desc.Windowed = ((GetWindowLongPtr(programData->m_GameWindow, GWL_STYLE) & WS_POPUP) != 0) ? false : true;
-
-			m_BuffersCounts = Desc.BufferCount;
-			m_FrameContext = new _FrameContext[m_BuffersCounts];
-
-			D3D12_DESCRIPTOR_HEAP_DESC DescriptorImGuiRender = {};
-			DescriptorImGuiRender.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-			DescriptorImGuiRender.NumDescriptors = m_BuffersCounts;
-			DescriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-
-			if (m_Device->CreateDescriptorHeap(&DescriptorImGuiRender, IID_PPV_ARGS(&m_DescriptorHeap)) != S_OK)
-				return 0;
-
-			ID3D12CommandAllocator* Allocator;
-			if (m_Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&Allocator)) != S_OK)
-				return 0;
-
-			for (size_t i = 0; i < m_BuffersCounts; i++) {
-				m_FrameContext[i].CommandAllocator = Allocator;
-			}
-
-			if (m_Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, Allocator, NULL, IID_PPV_ARGS(&m_CommandList)) != S_OK || m_CommandList->Close() != S_OK)
-				return 0;
-
-			D3D12_DESCRIPTOR_HEAP_DESC DescriptorBackBuffers;
-			DescriptorBackBuffers.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-			DescriptorBackBuffers.NumDescriptors = m_BuffersCounts;
-			DescriptorBackBuffers.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-			DescriptorBackBuffers.NodeMask = 1;
-
-			if (m_Device->CreateDescriptorHeap(&DescriptorBackBuffers, IID_PPV_ARGS(&m_rtvDescriptorHeap)) != S_OK)
-				return 0;
-
-			const auto RTVDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-			D3D12_CPU_DESCRIPTOR_HANDLE RTVHandle = m_rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-
-			for (size_t i = 0; i < m_BuffersCounts; i++) {
-				ID3D12Resource* pBackBuffer = nullptr;
-				m_FrameContext[i].DescriptorHandle = RTVHandle;
-				m_Swapchain->GetBuffer(i, IID_PPV_ARGS(&pBackBuffer));
-				m_Device->CreateRenderTargetView(pBackBuffer, nullptr, RTVHandle);
-				m_FrameContext[i].Resource = pBackBuffer;
-				RTVHandle.ptr += RTVDescriptorSize;
-			}
-
-			programData->m_GameWindow = FindWindowEx(NULL, NULL, "ELDEN RING™", NULL);
-			if (programData->m_GameWindow == NULL)
-			{
-				Logger::log("Failed to find \"ELDEN RING™\" window, trying to get via GetForegroundWindow", LogLevel::Warning);
-				programData->m_GameWindow = GetForegroundWindow();
-			}
-
-			m_OldWndProc = SetWindowLongPtrA(programData->m_GameWindow, GWLP_WNDPROC, (LONG_PTR)WndProc);
-
-			ImGui_ImplWin32_Init(programData->m_GameWindow);
-			ImGui_ImplDX12_Init(m_Device, m_BuffersCounts, DXGI_FORMAT_R8G8B8A8_UNORM, NULL, m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-			ImGui_ImplDX12_CreateDeviceObjects();
-			ImGui::GetIO().ImeWindowHandle = programData->m_GameWindow;
+		if (m_Device)
 			m_Device->Release();
-            return 1;
+
+		if (m_CommandList)
+			m_CommandList->Release();
+
+		if (m_srvDescriptorHeap)
+			m_srvDescriptorHeap->Release();
+
+		if (m_rtvDescriptorHeap)
+			m_rtvDescriptorHeap->Release();
+
+		for (IndexType i = 0; i < m_BuffersCounts; i++)
+		{
+			m_CommandAllocators[i]->Release();
+			m_BackBuffers[i]->Release();
 		}
 
-        return 0;
+		m_RenderTargets.clear();
+		delete[] m_CommandAllocators;
+		delete[] m_BackBuffers;
 
+		ImGui_ImplDX12_Shutdown();
+		SetWindowLongPtr(programData->m_GameWindow, GWLP_WNDPROC, (LONG_PTR)m_OldWndProc);
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
+
+		g_postureUI->textureBarInit = false;
+		m_Init = false;
 	}
 
 	bool D3DRenderer::InitWindow() 
@@ -866,31 +840,6 @@ namespace ER
 			return false;
 
 		return true;
-	}
-
-	void D3DRenderer::ResetRenderState()
-	{
-		if (m_Init)
-		{
-			m_DescriptorHeap->Release();
-			for (UINT i = 0; i < m_BuffersCounts; ++i)
-			{
-				m_CommandAllocator[i]->Release();
-				m_BackBuffer[i]->Release();
-			}
-			m_rtvDescriptorHeap->Release();
-			delete[]m_CommandAllocator;
-			delete[]m_BackBuffer;
-
-			ImGui_ImplDX12_Shutdown();
-			//Windows_Hook::Inst()->resetRenderState();
-			SetWindowLongPtr(programData->m_GameWindow, GWLP_WNDPROC, (LONG_PTR)m_OldWndProc);
-			ImGui_ImplWin32_Shutdown();
-			ImGui::DestroyContext();
-
-			g_postureUI->textureBarInit = false;
-			m_Init = false;
-		}
 	}
 
 	bool D3DRenderer::DeleteWindow() 
