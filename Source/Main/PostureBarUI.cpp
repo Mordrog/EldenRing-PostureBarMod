@@ -14,15 +14,6 @@
 
 namespace ER 
 {
-    float getTimeDifference(const LARGE_INTEGER& start, const LARGE_INTEGER& end)
-    {
-        static LARGE_INTEGER Frequency{};
-        if (Frequency.QuadPart <= 0)
-            QueryPerformanceFrequency(&Frequency);
-
-        return (((end.QuadPart - start.QuadPart) * 1000) / Frequency.QuadPart) * 0.001f;
-    }
-
     ImVec2 positionFixOffset(const PostureBarData& postureBar, const std::chrono::steady_clock::time_point& directXtimePoint)
     {
         float gameUIDelta = std::chrono::duration_cast<std::chrono::duration<float>>(postureBar.gameUiUpdateTimePoint - postureBar.gamePreviousUiUpdateTimePoint).count();
@@ -266,10 +257,11 @@ namespace ER
     bool PostureBarUI::isMenuOpen()
     {
         auto isLoad = RPM<bool>(g_Hooking->isLoading);
-        auto menuState = RPM<uint8_t>(g_Hooking->menuState);
+        auto menuStateCode = RPM<uint8_t>(g_Hooking->menuStateCode);
 
-        // 18 seems to be a "gameplay" state
-        return isLoad || menuState != 18;
+        static uint8_t menuClosedCode = menuStateCode;
+
+        return isLoad || (hideBarsOnMenu && menuStateCode != menuClosedCode);
     }
 
     void PostureBarUI::updateUIBarStructs(uintptr_t moveMapStep, uintptr_t time)

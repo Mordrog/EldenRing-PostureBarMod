@@ -23,7 +23,6 @@ namespace ER
 		{
 #endif // DEBUGLOG
 			Logger::log("Start Hooking");
-			g_D3DRenderer->Hook();
 
 			Logger::log("Hooking Elden Ring methods");
 
@@ -39,9 +38,16 @@ namespace ER
 			if (isLoading = Signature("19 0E 19 B4 00 00 00 00 00 ? 00 00 00 00 00 00 70 74 ? ? ? 7F 00 00 D0 7C ? ? ? 7F 00 00 40 AF ? ? ? 7F 00 00 08 7D ? ? ? 7F 00 00").Scan().Add(9).As<uint64_t>(); !isLoading)
 				Logger::log("Failed to find isLoading signature", LogLevel::Error);
 
-			Logger::log("Looking for menuState signature");
-			if (menuState = Signature("D0 71 ? ? ? 7F 00 00 48 F2 ? ? ? 7F 00 00 30 F5 ? ? ? 7F 00 00 40 04 40 00 00 00 00 00 8C 35 ? ? ? 7F 00 00 00 8F ? ? ? 7F 00 00 00 00 00 00 00 00 00 80 ? ?").Scan().Add(57).As<uint64_t>(); !menuState)
+			// Gets int32 between 0 and max_int32 if menu is up (does not work with map :/)
+			//Logger::log("Looking for menuState signature");
+			//if (menuState = Signature("20 9E ? ? ? 7F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 38 CB ? ? ? 7F 00 00 10 CB ? ? ? 7F 00 00 00 00 00 00 00 00 00 00 97 01 00 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 D8 CF ? ? ? 7F 00 00").Scan().Add(1244).As<uint64_t>(); !menuState)
+			//	Logger::log("Failed to find isLoading signature", LogLevel::Error);
+
+			if (menuStateCode = Signature("D0 07 00 02 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0C 10 00 00 00 00 00 00 00 00 ? ? ? 7F 00 00 D8 20 ? ? ? 7F 00 00 00 16 ? ? ? 7F 00 00 00 FE 3F 33 00 00 00 00").Scan().Add(489).As<uint64_t>(); !menuStateCode)
 				Logger::log("Failed to find isLoading signature", LogLevel::Error);
+
+			// get menu state, on start should be "close" but it might proof not relaiable, testing would be good...
+			g_postureUI->isMenuOpen();
 
 			Logger::log("Looking for GetChrInsFromHandleFunc signature");
 			if (GetChrInsFromHandleFunc = (GetChrInsFromHandle)Signature("48 83 EC 28 E8 17 FF FF FF 48 85 C0 74 08 48 8B 00 48 83 C4 28 C3").Scan().As<uint64_t>(); !GetChrInsFromHandleFunc)
@@ -54,6 +60,10 @@ namespace ER
 			Logger::log("Hooking UpdateUIBarStructsFunc");
 			if (MH_CreateHook(UpdateUIBarStructsFunc, &g_postureUI->updateUIBarStructs, (void**)&g_postureUI->updateUIBarStructsOriginal) != MH_STATUS::MH_OK)
 				Logger::log("Failed to hook UpdateUIBarStructsFunc", LogLevel::Error);
+
+			Logger::log("Hooking DirectX methods");
+
+			g_D3DRenderer->Hook();
 
 			MH_EnableHook(MH_ALL_HOOKS);
 #ifdef DEBUGLOG

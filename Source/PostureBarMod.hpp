@@ -24,6 +24,7 @@ namespace ER
 	inline float offsetSpeed = 0.5f;
 	inline EDebugTestState debugState = EDebugTestState::GameScreenOffset;
 
+	inline bool hideBarsOnMenu = true;
 }
 
 void MainThread();

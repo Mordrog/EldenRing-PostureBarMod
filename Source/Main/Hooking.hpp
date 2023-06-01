@@ -173,6 +173,7 @@ namespace ER
 		uintptr_t CSFeManSignature{};
 		uintptr_t isLoading{};
 		uintptr_t menuState{};
+		uintptr_t menuStateCode{};
 
 		// Static in game functions
 		typedef GameData::ChrIns* (*GetChrInsFromHandle)(GameData::WorldChrMan* worldChrMan, uint64_t* chrInsHandlePtr);

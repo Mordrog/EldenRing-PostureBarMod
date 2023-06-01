@@ -96,6 +96,11 @@ bool loadIni()
         PostureBarData::positionFixingMultiplierY = std::stof(ini["Entity Posture Bar"].get("PositionFixingMultiplierY"));
 
         //-----------------------------------------------------------------------------------
+        //									    Experimental
+        //-----------------------------------------------------------------------------------
+        hideBarsOnMenu = ini["Experimental"].get("hideBarsOnMenu") == "true";
+
+        //-----------------------------------------------------------------------------------
         //									    Debug
         //-----------------------------------------------------------------------------------
         Logger::useLogger = ini["Debug"].get("Log") == "true";
@@ -160,6 +165,8 @@ bool loadIni()
     Logger::log("\t\tUsePositionFixing: " + std::to_string(PostureBarData::usePositionFixing));
     Logger::log("\t\tPositionFixingMultiplierX: " + std::to_string(PostureBarData::positionFixingMultiplierX));
     Logger::log("\t\tPositionFixingMultiplierY: " + std::to_string(PostureBarData::positionFixingMultiplierY));
+    Logger::log("\tExperimental:");
+    Logger::log("\t\thideBarsOnMenu: " + std::to_string(hideBarsOnMenu));
     Logger::log("\tDebug:");
     Logger::log("\t\tLog: " + std::to_string(Logger::useLogger));
     Logger::log("\t\tOffsetTest: " + std::to_string(offsetTesting));
@@ -223,7 +230,7 @@ void MainThread()
     if (!loadIni())
         return;
 
-    std::this_thread::sleep_for(5s);
+    std::this_thread::sleep_for(3s);
     Logger::log("Starting Main Thread");
     g_D3DRenderer = std::make_unique<D3DRenderer>();
     g_D3DRenderer->loadBarTextures();
