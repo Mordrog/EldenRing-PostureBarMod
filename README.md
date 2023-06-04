@@ -40,6 +40,11 @@ Here are some common issues you might encounter:
 
 ## Changelog
 
+### Beta 0.4.0
+* Updated way mod is checking for open menus, also added option to disable this feature if it proofs not working for whatever reason
+* Changed way mod is looking for resources etc. to assume .dll relative path
+* Added stagger bar for player (not functional by default, usable only with mods that make use of player stagger values)
+
 ### Beta 0.3.0
 * Added textures for UI bars
 * Moved bars default offset position under HP bar to match new texture bars
