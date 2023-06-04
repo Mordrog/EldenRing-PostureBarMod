@@ -3,6 +3,25 @@
 
 namespace ER 
 {
+	struct PlayerPostureBarData
+	{
+		float maxStagger = 0.0f;
+		float stagger = 0.0f;
+
+		// Stagger reset
+		float previousStagger = 1.0f; // set to 1, as 0 would conflict with checking for posture break
+		bool isResetStagger = false;
+		float resetStaggerTimer = 0.0f;
+		std::chrono::steady_clock::time_point lastTimePoint{};
+
+		static inline bool  drawBar = true;
+		static inline float barWidth = 286.0f;
+		static inline float barHeight = 28.0f;
+		static inline float resetStaggerTotalTime = 2.0f;
+		static inline float screenX = 963.0f;
+		static inline float screenY = 100.0f;
+	};
+
 	struct BossPostureBarData
 	{
 		unsigned long long entityHandle = 0;
@@ -123,6 +142,7 @@ namespace ER
 		static void updateUIBarStructs(uintptr_t moveMapStep, uintptr_t time);
 		static inline void (*updateUIBarStructsOriginal)(uintptr_t, uintptr_t);
 
+		std::optional<PlayerPostureBarData> playerBar = std::nullopt;
 		std::array<std::optional<PostureBarData>, ENTITY_CHR_ARRAY_LEN> postureBars = make_array<std::optional<PostureBarData>, ENTITY_CHR_ARRAY_LEN>(std::nullopt);
 		std::array<std::optional<BossPostureBarData>, BOSS_CHR_ARRAY_LEN> bossPostureBars = make_array<std::optional<BossPostureBarData>, BOSS_CHR_ARRAY_LEN>(std::nullopt);
 

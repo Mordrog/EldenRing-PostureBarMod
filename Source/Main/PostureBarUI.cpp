@@ -98,6 +98,56 @@ namespace ER
             return;
         }
 
+        if (PlayerPostureBarData::drawBar)
+        {
+            if (auto playerPostureBar = playerBar; playerPostureBar)
+            {
+                auto&& timePoint = std::chrono::steady_clock::now();
+
+                float staggerRatio = playerPostureBar->stagger / playerPostureBar->maxStagger;
+
+                float height = PlayerPostureBarData::barHeight * ScreenParams::gameToViewportScaling;
+                float width = PlayerPostureBarData::barWidth * ScreenParams::gameToViewportScaling;
+                ImVec2 viewportPosition = ImVec2(PlayerPostureBarData::screenX, PlayerPostureBarData::screenY) * ScreenParams::gameToViewportScaling;
+
+                // apply screen position offset
+                viewportPosition.x += ScreenParams::posX;
+                viewportPosition.y += ScreenParams::posY;
+
+                // apply offset so x is in middle of bar 
+                viewportPosition.x -= (width * 0.5f);
+
+                if (playerPostureBar->isResetStagger)
+                {
+                    playerPostureBar->resetStaggerTimer -= std::chrono::duration_cast<std::chrono::duration<float>>(timePoint - playerPostureBar->lastTimePoint).count();
+                    playerPostureBar->lastTimePoint = timePoint;
+
+                    if (playerPostureBar->resetStaggerTimer <= 0.0f)
+                        playerPostureBar->isResetStagger = false;
+                    else
+                    {
+                        float timeRatio = 1.0f - playerPostureBar->resetStaggerTimer / PlayerPostureBarData::resetStaggerTotalTime;
+
+                        auto barColor = getBarColor(false, staggerRatio);
+
+                        if (textureBarInit)
+                            drawBar(entityBarTexture, barColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, timeRatio);
+                        else
+                            drawBar(barColor, viewportPosition, ImVec2(width, height), timeRatio);
+                    }
+                }
+                else
+                {
+                    auto barColor = getBarColor(false, staggerRatio);
+
+                    if (textureBarInit)
+                        drawBar(entityBarTexture, barColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, staggerRatio);
+                    else
+                        drawBar(barColor, viewportPosition, ImVec2(width, height), staggerRatio);
+                }
+            }
+        }
+
         if (BossPostureBarData::drawBars)
             for (IndexType i = 0; i < BOSS_CHR_ARRAY_LEN; i++)
                 if (auto bossPostureBar = bossPostureBars[i]; bossPostureBar && bossPostureBar->isVisible)
@@ -285,6 +335,41 @@ namespace ER
             return;
         }
         called = false;
+
+        if (PlayerPostureBarData::drawBar)
+        {
+            if (auto&& chrIns = g_Hooking->GetChrInsFromHandleFunc(worldChar, &(*worldChar->playerArray[0])->handle); chrIns && chrIns->chrModulelBag->staggerModule->staggerMax > 0.0f)
+            {
+                auto&& timePoint = std::chrono::steady_clock::now();
+                auto&& previousPlayerStaggerBar = g_postureUI->playerBar;
+                PlayerPostureBarData playerBarData;
+
+                playerBarData.maxStagger = chrIns->chrModulelBag->staggerModule->staggerMax;
+                playerBarData.stagger = chrIns->chrModulelBag->staggerModule->stagger;
+
+                if (previousPlayerStaggerBar)
+                {
+                    if (PlayerPostureBarData::resetStaggerTotalTime > 0.0f && previousPlayerStaggerBar->previousStagger <= 0.0f && playerBarData.stagger == playerBarData.maxStagger)
+                    {
+                        playerBarData.isResetStagger = true;
+                        playerBarData.resetStaggerTimer = PlayerPostureBarData::resetStaggerTotalTime;
+                        playerBarData.lastTimePoint = timePoint;
+                    }
+                    else
+                    {
+                        playerBarData.isResetStagger = previousPlayerStaggerBar->isResetStagger;
+                        playerBarData.resetStaggerTimer = previousPlayerStaggerBar->resetStaggerTimer;
+                        playerBarData.lastTimePoint = previousPlayerStaggerBar->lastTimePoint;
+                    }
+
+                    playerBarData.previousStagger = playerBarData.stagger;
+                }
+
+                g_postureUI->playerBar = playerBarData;
+            }
+            else
+                g_postureUI->playerBar = std::nullopt;
+        }
 
         for (IndexType i = 0; i < BOSS_CHR_ARRAY_LEN; i++)
             if (auto&& entityHandle = feMan->bossHpBars[i].bossHandle; entityHandle != __UINT64_MAX__)

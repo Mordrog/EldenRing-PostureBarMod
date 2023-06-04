@@ -98,7 +98,13 @@ bool loadIni()
         //-----------------------------------------------------------------------------------
         //									    Experimental
         //-----------------------------------------------------------------------------------
-        hideBarsOnMenu = ini["Experimental"].get("hideBarsOnMenu") == "true";
+        hideBarsOnMenu = ini["Experimental"].get("HideBarsOnMenu") == "true";
+        PlayerPostureBarData::drawBar = ini["Experimental"].get("DrawBar") == "true";
+        PlayerPostureBarData::barWidth = std::stof(ini["Experimental"].get("BarWidth"));
+        PlayerPostureBarData::barHeight = std::stof(ini["Experimental"].get("BarHeight"));
+        PlayerPostureBarData::resetStaggerTotalTime = std::stof(ini["Experimental"].get("ResetStaggerTotalTime"));
+        PlayerPostureBarData::screenX = std::stof(ini["Experimental"].get("ScreenX"));
+        PlayerPostureBarData::screenY = std::stof(ini["Experimental"].get("ScreenY"));
 
         //-----------------------------------------------------------------------------------
         //									    Debug
@@ -167,7 +173,13 @@ bool loadIni()
     Logger::log("\t\tPositionFixingMultiplierX: " + std::to_string(PostureBarData::positionFixingMultiplierX));
     Logger::log("\t\tPositionFixingMultiplierY: " + std::to_string(PostureBarData::positionFixingMultiplierY));
     Logger::log("\tExperimental:");
-    Logger::log("\t\thideBarsOnMenu: " + std::to_string(hideBarsOnMenu));
+    Logger::log("\t\tHideBarsOnMenu: " + std::to_string(hideBarsOnMenu));
+    Logger::log("\t\tDrawBar: " + std::to_string(PlayerPostureBarData::drawBar));
+    Logger::log("\t\tBarWidth: " + std::to_string(PlayerPostureBarData::barWidth));
+    Logger::log("\t\tBarHeight: " + std::to_string(PlayerPostureBarData::barHeight));
+    Logger::log("\t\tResetStaggerTotalTime: " + std::to_string(PlayerPostureBarData::resetStaggerTotalTime));
+    Logger::log("\t\tScreenX: " + std::to_string(PlayerPostureBarData::screenX));
+    Logger::log("\t\tScreenY: " + std::to_string(PlayerPostureBarData::screenY));
     Logger::log("\tDebug:");
     Logger::log("\t\tLog: " + std::to_string(Logger::useLogger));
     Logger::log("\t\tOffsetTest: " + std::to_string(offsetTesting));
