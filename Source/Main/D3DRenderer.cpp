@@ -566,13 +566,13 @@ namespace ER
 					}
 
 					g_postureUI->bossBarTexture = TextureBar(
-						TextureData((ImTextureID)bossBarBorderTextureData.gpuHandle.ptr, bossBarBorderTextureData.width, bossBarBorderTextureData.height), 
-						TextureData((ImTextureID)bossBarTextureData.gpuHandle.ptr, bossBarTextureData.width, bossBarTextureData.height)
+						TextureData((ImTextureID)bossBarBorderTextureData.gpuHandle.ptr, (float)bossBarBorderTextureData.width, (float)bossBarBorderTextureData.height), 
+						TextureData((ImTextureID)bossBarTextureData.gpuHandle.ptr, (float)bossBarTextureData.width, (float)bossBarTextureData.height)
 					);
 					
 					g_postureUI->entityBarTexture = TextureBar(
-						TextureData((ImTextureID)entityBarBorderTextureData.gpuHandle.ptr, entityBarBorderTextureData.width, entityBarBorderTextureData.height), 
-						TextureData((ImTextureID)entityBarTextureData.gpuHandle.ptr, entityBarTextureData.width, entityBarTextureData.height)
+						TextureData((ImTextureID)entityBarBorderTextureData.gpuHandle.ptr, (float)entityBarBorderTextureData.width, (float)entityBarBorderTextureData.height), 
+						TextureData((ImTextureID)entityBarTextureData.gpuHandle.ptr, (float)entityBarTextureData.width, (float)entityBarTextureData.height)
 					);
 					g_postureUI->textureBarInit = true;
 					Logger::log("All texture init successfully");
@@ -596,14 +596,14 @@ namespace ER
 				SIZE_T rtvDescriptorSize = pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 				D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 				m_CommandAllocators = new ID3D12CommandAllocator * [sc_desc.BufferCount];
-				for (int i = 0; i < sc_desc.BufferCount; ++i)
+				for (IndexType i = 0; i < sc_desc.BufferCount; ++i)
 				{
 					m_RenderTargets.push_back(rtvHandle);
 					rtvHandle.ptr += rtvDescriptorSize;
 				}
 			}
 
-			for (UINT i = 0; i < sc_desc.BufferCount; ++i)
+			for (IndexType i = 0; i < sc_desc.BufferCount; ++i)
 			{
 				if (pDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_CommandAllocators[i])) != S_OK)
 				{
@@ -627,7 +627,7 @@ namespace ER
 				pDevice->Release();
 				pSwapChain3->Release();
 				m_srvDescriptorHeap->Release();
-				for (UINT i = 0; i < sc_desc.BufferCount; ++i)
+				for (IndexType i = 0; i < sc_desc.BufferCount; ++i)
 					m_CommandAllocators[i]->Release();
 				m_rtvDescriptorHeap->Release();
 				delete[]m_CommandAllocators;
@@ -636,7 +636,7 @@ namespace ER
 			}
 
 			m_BackBuffers = new ID3D12Resource * [sc_desc.BufferCount];
-			for (UINT i = 0; i < sc_desc.BufferCount; i++)
+			for (IndexType i = 0; i < sc_desc.BufferCount; i++)
 			{
 				pSwapChain3->GetBuffer(i, IID_PPV_ARGS(&m_BackBuffers[i]));
 				pDevice->CreateRenderTargetView(m_BackBuffers[i], NULL, m_RenderTargets[i]);
