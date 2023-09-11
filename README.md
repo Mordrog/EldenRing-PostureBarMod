@@ -40,6 +40,9 @@ Here are some common issues you might encounter:
 
 ## Changelog
 
+### Beta 0.4.2
+* Updated AOB and functionality of checking for open menus
+
 ### Beta 0.4.0
 * Updated way mod is checking for open menus, also added option to disable this feature if it proofs not working for whatever reason
 * Changed way mod is looking for resources etc. to assume .dll relative path
