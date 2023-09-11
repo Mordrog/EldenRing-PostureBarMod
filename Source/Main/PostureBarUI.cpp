@@ -306,12 +306,13 @@ namespace ER
 
     bool PostureBarUI::isMenuOpen()
     {
+        if (!hideBarsOnMenu)
+            return false;
+
         auto isLoad = RPM<bool>(g_Hooking->isLoading);
-        auto menuStateCode = RPM<uint8_t>(g_Hooking->menuStateCode);
+        auto menuOpen = (RPM<uint32_t>(g_Hooking->menuState1) != __UINT32_MAX__ || RPM<uint32_t>(g_Hooking->menuState2) != __UINT32_MAX__ || RPM<uint32_t>(g_Hooking->menuState3) != __UINT32_MAX__);
 
-        static uint8_t menuClosedCode = menuStateCode;
-
-        return isLoad || (hideBarsOnMenu && menuStateCode != menuClosedCode);
+        return isLoad || menuOpen;
     }
 
     void PostureBarUI::updateUIBarStructs(uintptr_t moveMapStep, uintptr_t time)

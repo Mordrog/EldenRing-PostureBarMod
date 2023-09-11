@@ -35,19 +35,16 @@ namespace ER
 				Logger::log("Failed to find worldChr signature", LogLevel::Error);
 
 			Logger::log("Looking for isLoading signature");
-			if (isLoading = Signature("19 0E 19 B4 00 00 00 00 00 ? 00 00 00 00 00 00 70 74 ? ? ? 7F 00 00 D0 7C ? ? ? 7F 00 00 40 AF ? ? ? 7F 00 00 08 7D ? ? ? 7F 00 00").Scan().Add(9).As<uint64_t>(); !isLoading)
+			if (isLoading = Signature("10 75 ? ? ? 7F 00 00 20 75 ? ? ? 7F 00 00 00 00 00 00 00 00 00 00 E4 01 00 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ? ? ? 00 00 00 00 00 00 00 00 00 00 00 00 00 19 0E 19 B4 00 00 00 00 00").Scan().Add(81).As<uint64_t>(); !isLoading)
 				Logger::log("Failed to find isLoading signature", LogLevel::Error);
 
-			// Gets int32 between 0 and max_int32 if menu is up (does not work with map :/)
-			//Logger::log("Looking for menuState signature");
-			//if (menuState = Signature("20 9E ? ? ? 7F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 38 CB ? ? ? 7F 00 00 10 CB ? ? ? 7F 00 00 00 00 00 00 00 00 00 00 97 01 00 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 D8 CF ? ? ? 7F 00 00").Scan().Add(1244).As<uint64_t>(); !menuState)
-			//	Logger::log("Failed to find isLoading signature", LogLevel::Error);
-
-			if (menuStateCode = Signature("D0 07 00 02 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0C 10 00 00 00 00 00 00 00 00 ? ? ? 7F 00 00 D8 20 ? ? ? 7F 00 00 00 16 ? ? ? 7F 00 00 00 FE 3F 33 00 00 00 00").Scan().Add(489).As<uint64_t>(); !menuStateCode)
-				Logger::log("Failed to find isLoading signature", LogLevel::Error);
-
-			// get menu state, on start should be "close" but it might proof not relaiable, testing would be good...
-			g_postureUI->isMenuOpen();
+			Logger::log("Looking for menuState signature");
+			if (menuState1 = Signature("20 9E ? ? ? 7F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 98 B7 ? ? ? 7F 00 00 A0 B7 ? ? ? 7F 00 00 00 00 00 00 00 00 00 00 96 01 00 80").Scan().Add(1420).As<uint64_t>(); !menuState1)
+				Logger::log("Failed to find menuState signature", LogLevel::Error);
+			if (menuState2 = Signature("20 9E ? ? ? 7F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 98 B7 ? ? ? 7F 00 00 A0 B7 ? ? ? 7F 00 00 00 00 00 00 00 00 00 00 96 01 00 80").Scan().Add(1424).As<uint64_t>(); !menuState2)
+				Logger::log("Failed to find menuState signature", LogLevel::Error);
+			if (menuState3 = Signature("20 9E ? ? ? 7F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 98 B7 ? ? ? 7F 00 00 A0 B7 ? ? ? 7F 00 00 00 00 00 00 00 00 00 00 96 01 00 80").Scan().Add(1428).As<uint64_t>(); !menuState3)
+				Logger::log("Failed to find menuState signature", LogLevel::Error);
 
 			Logger::log("Looking for GetChrInsFromHandleFunc signature");
 			if (GetChrInsFromHandleFunc = (GetChrInsFromHandle)Signature("48 83 EC 28 E8 17 FF FF FF 48 85 C0 74 08 48 8B 00 48 83 C4 28 C3").Scan().As<uint64_t>(); !GetChrInsFromHandleFunc)
