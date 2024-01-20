@@ -60,6 +60,10 @@ namespace ER
 		template <typename T>
 		constexpr MemoryHandle Add(T offset)
 		{
+			if(!m_Ptr)
+			{
+				return {};
+			}
 			return MemoryHandle(As<std::uintptr_t>() + offset);
 		}
 
@@ -71,6 +75,10 @@ namespace ER
 		template <typename T>
 		constexpr MemoryHandle Sub(T offset)
 		{
+			if (!m_Ptr)
+			{
+				return {};
+			}
 			return MemoryHandle(As<std::uintptr_t>() - offset);
 		}
 
