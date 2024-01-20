@@ -97,8 +97,33 @@ namespace ER
 		static inline bool  autoGameToViewportScaling = true;
 	};
 
+	enum class EFillAlignment : uint_fast8_t
+	{
+		Left,
+		Center,
+		Right,
+		Last
+	};
+
+	enum class EFillType : uint_fast8_t
+	{
+		FullToEmpty,
+		EmptyToFull,
+		Last
+	};
+
+	enum class EFillResizeType : uint_fast8_t
+	{
+		Clip,
+		Scale,
+		Last
+	};
+
 	struct BarStyle
 	{
+		static inline EFillAlignment fillAlignment = EFillAlignment::Left;
+		static inline EFillType fillType = EFillType::FullToEmpty;
+		static inline EFillResizeType fillResizeType = EFillResizeType::Clip;
 		static inline ImVec4 staggerMaxColor = { 255, 255, 0, 255 };
 		static inline ImVec4 staggerMinColor = { 255, 255, 0, 255 };
 		static inline ImVec4 staminaMaxColor = { 80, 200, 104, 255 };

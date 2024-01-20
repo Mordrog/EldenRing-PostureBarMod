@@ -49,6 +49,13 @@ bool loadIni()
         //-----------------------------------------------------------------------------------
         //									    Style
         //-----------------------------------------------------------------------------------
+        BarStyle::fillAlignment = EFillAlignment(stoi(ini["Style"].get("FillAlignment")));
+        assert((int)BarStyle::fillAlignment >= 0 && BarStyle::fillAlignment < EFillAlignment::Last);
+        BarStyle::fillType = EFillType(stoi(ini["Style"].get("FillType")));
+        assert((int)BarStyle::fillType >= 0 && BarStyle::fillType < EFillType::Last);
+        BarStyle::fillResizeType = EFillResizeType(stoi(ini["Style"].get("FillResizeType")));
+        assert((int)BarStyle::fillResizeType >= 0 && BarStyle::fillResizeType < EFillResizeType::Last);
+
         auto&& staggerColorMax = splitString(ini["Style"].get("StaggerColorMax"), ",");
         assert(staggerColorMax.size() == 4);
         BarStyle::staggerMaxColor = ImVec4(std::stof(staggerColorMax[0]), std::stof(staggerColorMax[1]), std::stof(staggerColorMax[2]), std::stof(staggerColorMax[3]));
@@ -144,6 +151,9 @@ bool loadIni()
     Logger::log("\t\tBossFillOffset: " + std::to_string(TextureData::bossOffset));
     Logger::log("\t\tEntityFillOffset: " + std::to_string(TextureData::entityOffset));
     Logger::log("\tStyle:");
+    Logger::log("\t\tFillAlignment: " + std::to_string((int)BarStyle::fillAlignment));
+    Logger::log("\t\tFillType: " + std::to_string((int)BarStyle::fillType));
+    Logger::log("\t\tFillResizeType: " + std::to_string((int)BarStyle::fillResizeType));
     Logger::log("\t\tStaggerMaxColor: " + std::to_string(BarStyle::staggerMaxColor));
     Logger::log("\t\tStaggerMinColor: " + std::to_string(BarStyle::staggerMinColor));
     Logger::log("\t\tStaminaMaxColor: " + std::to_string(BarStyle::staminaMaxColor));

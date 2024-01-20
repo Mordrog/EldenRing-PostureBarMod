@@ -24,6 +24,9 @@
     <Filter Include="Source Files\Stb">
       <UniqueIdentifier>{83867c03-cce2-4b57-8328-3f4a226f5db8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\DirectX">
+      <UniqueIdentifier>{4abda075-d16b-4ff5-9c0b-0f1f2310e07e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\dllmain.cpp">
@@ -159,6 +162,9 @@
     </ClInclude>
     <ClInclude Include="Source\Stb\stb_image.h">
       <Filter>Source Files\Stb</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DirectX\d3dx12.h">
+      <Filter>Source Files\DirectX</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

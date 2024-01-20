@@ -108,14 +108,11 @@ namespace ER
 
                 float height = PlayerPostureBarData::barHeight * ScreenParams::gameToViewportScaling;
                 float width = PlayerPostureBarData::barWidth * ScreenParams::gameToViewportScaling;
-                ImVec2 viewportPosition = ImVec2(PlayerPostureBarData::screenX, PlayerPostureBarData::screenY) * ScreenParams::gameToViewportScaling;
+                ImVec2 positionOnViewport = ImVec2(PlayerPostureBarData::screenX, PlayerPostureBarData::screenY) * ScreenParams::gameToViewportScaling;
 
                 // apply screen position offset
-                viewportPosition.x += ScreenParams::posX;
-                viewportPosition.y += ScreenParams::posY;
-
-                // apply offset so x is in middle of bar 
-                viewportPosition.x -= (width * 0.5f);
+                positionOnViewport.x += ScreenParams::posX;
+                positionOnViewport.y += ScreenParams::posY;
 
                 if (playerPostureBar->isResetStagger)
                 {
@@ -131,9 +128,9 @@ namespace ER
                         auto barColor = getBarColor(false, staggerRatio);
 
                         if (textureBarInit)
-                            drawBar(entityBarTexture, barColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, timeRatio);
+                            drawBar(entityBarTexture, barColor, positionOnViewport, ImVec2(width, height), TextureData::entityOffset, timeRatio);
                         else
-                            drawBar(barColor, viewportPosition, ImVec2(width, height), timeRatio);
+                            drawBar(barColor, positionOnViewport, ImVec2(width, height), timeRatio);
                     }
                 }
                 else
@@ -141,9 +138,9 @@ namespace ER
                     auto barColor = getBarColor(false, staggerRatio);
 
                     if (textureBarInit)
-                        drawBar(entityBarTexture, barColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, staggerRatio);
+                        drawBar(entityBarTexture, barColor, positionOnViewport, ImVec2(width, height), TextureData::entityOffset, staggerRatio);
                     else
-                        drawBar(barColor, viewportPosition, ImVec2(width, height), staggerRatio);
+                        drawBar(barColor, positionOnViewport, ImVec2(width, height), staggerRatio);
                 }
             }
         }
@@ -166,9 +163,6 @@ namespace ER
 
                     // apply offset if bar is for second and third boss
                     viewportPosition.y -= ((float)i * BossPostureBarData::nextBossBarDiffScreenY) * ScreenParams::gameToViewportScaling;
-
-                    // apply offset so x is in middle of bar 
-                    viewportPosition.x -= (width * 0.5f);
 
                     if (bossPostureBar->isResetStagger)
                     {
@@ -223,9 +217,6 @@ namespace ER
                     float height = PostureBarData::barHeight * ScreenParams::gameToViewportScaling;
                     float width = PostureBarData::barWidth * distanceModifier * ScreenParams::gameToViewportScaling;
                     ImVec2 viewportPosition = gamePosition * ScreenParams::gameToViewportScaling;
-
-                    // apply offset so x is in middle of bar
-                    viewportPosition.x -= (width * 0.5f);
 
                     // apply screen position offset
                     viewportPosition.x += ScreenParams::posX;
@@ -285,18 +276,46 @@ namespace ER
     {
         auto&& [topLeftFillOffset, botRightFillOffset] = fillOffset;
         auto&& [barTextureBorder, barTextureFill] = textureBar;
-        ImVec2 fillScale(size.x / (float)barTextureFill.width, size.y / (float)barTextureFill.height);
-        ImVec2 borderScale(size.x / (float)barTextureBorder.width, size.y / (float)barTextureBorder.height);
+        ImVec2 fillScale(size.x / barTextureFill.width, size.y / barTextureFill.height);
+        ImVec2 borderScale(size.x / barTextureBorder.width, size.y / barTextureBorder.height);
 
-        ImVec2 fillTopLeftScaled = topLeftFillOffset * fillScale;
-        ImVec2 fillBotRightScaled = (ImVec2((float)barTextureFill.width, (float)barTextureFill.height) + botRightFillOffset) * fillScale;
+        ImVec2 fillTopLeftScaled = (ImVec2(-barTextureFill.width * 0.5f, 0.0f) + topLeftFillOffset) * fillScale;
+        ImVec2 fillBotRightScaled = (ImVec2(barTextureFill.width * 0.5f, barTextureFill.height) + botRightFillOffset) * fillScale;
+
+        auto getFillPositions = [](float width, float ratio, EFillAlignment alignment, EFillType type) -> std::pair<ImVec2, ImVec2>
+        {
+            ratio = (type == EFillType::EmptyToFull) ? ratio : 1.0f - ratio;
+
+            switch (alignment)
+            {
+                using enum EFillAlignment;
+                case Left:
+                    return { ImVec2(0.0f, 0.0f), ImVec2(-width * ratio, 0.0f) };
+                case Center:
+                    return { ImVec2(width * ratio * 0.5f, 0.0f), ImVec2(-width * ratio * 0.5f, 0.0f) };
+                case Right:
+                    return { ImVec2(width * ratio, 1.0f), ImVec2(0.0f, 0.0f) };
+                default:
+                    throw("EFillAlignment out of bounds index");
+            }
+        };
+
+        auto&& [leftFill, rightFill] = getFillPositions(std::abs(fillTopLeftScaled.x - fillBotRightScaled.x), fillRatio, BarStyle::fillAlignment, BarStyle::fillType);
 
         // Add Fill texture with clip to stagger ratio
-        ImGui::GetBackgroundDrawList()->PushClipRect(position + fillTopLeftScaled, position + fillBotRightScaled * ImVec2(fillRatio, 1.0f));
-        ImGui::GetBackgroundDrawList()->AddImage(barTextureFill.texture, position + fillTopLeftScaled, position + fillBotRightScaled, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), color);
-        ImGui::GetBackgroundDrawList()->PopClipRect();
+        if (BarStyle::fillResizeType == EFillResizeType::Clip)
+        {
+            ImGui::GetBackgroundDrawList()->PushClipRect(position + fillTopLeftScaled + leftFill, position + fillBotRightScaled + rightFill);
+            ImGui::GetBackgroundDrawList()->AddImage(barTextureFill.texture, position + fillTopLeftScaled, position + fillBotRightScaled, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), color);
+            ImGui::GetBackgroundDrawList()->PopClipRect();
+        }
+        else if (BarStyle::fillResizeType == EFillResizeType::Scale)
+        {
+            ImGui::GetBackgroundDrawList()->AddImage(barTextureFill.texture, position + fillTopLeftScaled + leftFill, position + fillBotRightScaled + rightFill, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), color);
+        }
+
         // Add Border texture
-        ImGui::GetBackgroundDrawList()->AddImage(barTextureBorder.texture, position, position + ImVec2((float)barTextureBorder.width, (float)barTextureBorder.height) * borderScale);
+        ImGui::GetBackgroundDrawList()->AddImage(barTextureBorder.texture, position - ImVec2(barTextureBorder.width * 0.5f, 0.0f) * borderScale, position + ImVec2(barTextureBorder.width * 0.5f, barTextureBorder.height) * borderScale);
     }
 
     void PostureBarUI::drawBar(const ImColor& color, const ImVec2& position, const ImVec2& size, float fillRatio)
