@@ -39,11 +39,11 @@ namespace ER
 				Logger::log("Failed to find isLoading signature", LogLevel::Error);
 
 			Logger::log("Looking for menuState signature");
-			if (menuState1 = Signature("20 9E ? ? ? ? 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 98 B7 ? ? ? ? 00 00 A0 B7 ? ? ? ? 00 00 00 00 00 00 00 00 00 00 96 01 00 80").Scan().Add(1420).As<uint64_t>(); !menuState1)
+			if (menuState1 = Signature("20 9E ? ? ? ? 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 40 CB ? ? ? ? 00 00 18 CB ? ? ? ? 00 00 00 00 00 00 00 00 00 00 97 01 00 80").Scan().Add(1244).As<uint64_t>(); !menuState1)
 				Logger::log("Failed to find menuState signature", LogLevel::Error);
-			if (menuState2 = Signature("20 9E ? ? ? ? 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 98 B7 ? ? ? ? 00 00 A0 B7 ? ? ? ? 00 00 00 00 00 00 00 00 00 00 96 01 00 80").Scan().Add(1424).As<uint64_t>(); !menuState2)
+			if (menuState2 = Signature("20 9E ? ? ? ? 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 40 CB ? ? ? ? 00 00 18 CB ? ? ? ? 00 00 00 00 00 00 00 00 00 00 97 01 00 80").Scan().Add(1248).As<uint64_t>(); !menuState2)
 				Logger::log("Failed to find menuState signature", LogLevel::Error);
-			if (menuState3 = Signature("20 9E ? ? ? ? 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 98 B7 ? ? ? ? 00 00 A0 B7 ? ? ? ? 00 00 00 00 00 00 00 00 00 00 96 01 00 80").Scan().Add(1428).As<uint64_t>(); !menuState3)
+			if (menuState3 = Signature("20 9E ? ? ? ? 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 40 CB ? ? ? ? 00 00 18 CB ? ? ? ? 00 00 00 00 00 00 00 00 00 00 97 01 00 80").Scan().Add(1252).As<uint64_t>(); !menuState3)
 				Logger::log("Failed to find menuState signature", LogLevel::Error);
 
 			Logger::log("Looking for GetChrInsFromHandleFunc signature");
