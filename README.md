@@ -40,6 +40,13 @@ Here are some common issues you might encounter:
 
 ## Changelog
 
+### Beta 0.5.0
+* Updated AOB and functionality of checking for open menus after patch 1.10.1
+* Fixes for logging for missing AOB (thanks to [viniciuslrangel](https://github.com/viniciuslrangel))
+* Made open menus functionality disabled by default
+* Added new options for menu styles: Set from which alignment shall bar fill, Set if bar should be filled or emptied when enemy stagger level drops, Set if fill texture should be cliped or resized
+* Added Sekiro style bars (with configs setup for them)
+
 ### Beta 0.4.2
 * Updated AOB and functionality of checking for open menus
 
