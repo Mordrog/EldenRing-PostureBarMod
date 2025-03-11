@@ -9,7 +9,7 @@ using namespace ER;
 
 bool loadIni()
 {
-    try
+    try    
     {
         using namespace mINI;
         INIFile config(dllPath + "PostureBarModConfig.ini");
@@ -72,6 +72,61 @@ bool loadIni()
         assert(staminaColorMin.size() == 4);
         BarStyle::staminaMinColor = ImVec4(std::stof(staminaColorMin[0]), std::stof(staminaColorMin[1]), std::stof(staminaColorMin[2]), std::stof(staminaColorMin[3]));
 
+		barHeightMultiplier = std::stof(ini["Style"].get("BarHeightMultiplier"));
+		assert(barHeightMultiplier > 0.f);
+
+		auto&& poisonColorMax = splitString(ini["Style"].get("PoisonColorMax"), ",");
+		assert(poisonColorMax.size() == 4);
+		BarStyle::poisonMaxColor = ImVec4(std::stof(poisonColorMax[0]), std::stof(poisonColorMax[1]), std::stof(poisonColorMax[2]), std::stof(poisonColorMax[3]));
+
+		auto&& poisonColorMin = splitString(ini["Style"].get("PoisonColorMin"), ",");
+		assert(poisonColorMin.size() == 4);
+		BarStyle::poisonMinColor = ImVec4(std::stof(poisonColorMin[0]), std::stof(poisonColorMin[1]), std::stof(poisonColorMin[2]), std::stof(poisonColorMin[3]));
+
+		auto&& rotColorMax = splitString(ini["Style"].get("RotColorMax"), ",");
+		assert(rotColorMax.size() == 4);
+		BarStyle::rotMaxColor = ImVec4(std::stof(rotColorMax[0]), std::stof(rotColorMax[1]), std::stof(rotColorMax[2]), std::stof(rotColorMax[3]));
+
+		auto&& rotColorMin = splitString(ini["Style"].get("RotColorMin"), ",");
+		assert(rotColorMin.size() == 4);
+		BarStyle::rotMinColor = ImVec4(std::stof(rotColorMin[0]), std::stof(rotColorMin[1]), std::stof(rotColorMin[2]), std::stof(rotColorMin[3]));
+
+		auto&& bleedColorMax = splitString(ini["Style"].get("BleedColorMax"), ",");
+		assert(bleedColorMax.size() == 4);
+		BarStyle::bleedMaxColor = ImVec4(std::stof(bleedColorMax[0]), std::stof(bleedColorMax[1]), std::stof(bleedColorMax[2]), std::stof(bleedColorMax[3]));
+
+		auto&& bleedColorMin = splitString(ini["Style"].get("BleedColorMin"), ",");
+		assert(bleedColorMin.size() == 4);
+		BarStyle::bleedMinColor = ImVec4(std::stof(bleedColorMin[0]), std::stof(bleedColorMin[1]), std::stof(bleedColorMin[2]), std::stof(bleedColorMin[3]));
+
+		auto&& blightColorMax = splitString(ini["Style"].get("BlightColorMax"), ",");
+		assert(blightColorMax.size() == 4);
+		BarStyle::blightMaxColor = ImVec4(std::stof(blightColorMax[0]), std::stof(blightColorMax[1]), std::stof(blightColorMax[2]), std::stof(blightColorMax[3]));
+
+		auto&& blightColorMin = splitString(ini["Style"].get("BlightColorMin"), ",");
+		assert(blightColorMin.size() == 4);
+		BarStyle::blightMinColor = ImVec4(std::stof(blightColorMin[0]), std::stof(blightColorMin[1]), std::stof(blightColorMin[2]), std::stof(blightColorMin[3]));
+
+		auto&& frostColorMax = splitString(ini["Style"].get("FrostColorMax"), ",");
+		assert(frostColorMax.size() == 4);
+		BarStyle::frostMaxColor = ImVec4(std::stof(frostColorMax[0]), std::stof(frostColorMax[1]), std::stof(frostColorMax[2]), std::stof(frostColorMax[3]));
+
+		auto&& frostColorMin = splitString(ini["Style"].get("FrostColorMin"), ",");
+		assert(frostColorMin.size() == 4);
+		BarStyle::frostMinColor = ImVec4(std::stof(frostColorMin[0]), std::stof(frostColorMin[1]), std::stof(frostColorMin[2]), std::stof(frostColorMin[3]));
+
+		auto&& sleepColorMax = splitString(ini["Style"].get("SleepColorMax"), ",");
+		assert(sleepColorMax.size() == 4);
+		BarStyle::sleepMaxColor = ImVec4(std::stof(sleepColorMax[0]), std::stof(sleepColorMax[1]), std::stof(sleepColorMax[2]), std::stof(sleepColorMax[3]));
+
+		auto&& sleepColorMin = splitString(ini["Style"].get("SleepColorMin"), ",");
+		assert(sleepColorMin.size() == 4);
+		BarStyle::sleepMinColor = ImVec4(std::stof(sleepColorMin[0]), std::stof(sleepColorMin[1]), std::stof(sleepColorMin[2]), std::stof(sleepColorMin[3]));
+
+		auto&& madnessColorMax = splitString(ini["Style"].get("MadnessColorMax"), ",");
+		assert(madnessColorMax.size() == 4);
+		BarStyle::madnessMaxColor = ImVec4(std::stof(madnessColorMax[0]), std::stof(madnessColorMax[1]), std::stof(madnessColorMax[2]), std::stof(madnessColorMax[3]));
+
         //-----------------------------------------------------------------------------------
         //									    Boss Posture Bar
         //-----------------------------------------------------------------------------------
@@ -83,6 +138,15 @@ bool loadIni()
         BossPostureBarData::firstBossScreenX = std::stof(ini["Boss Posture Bar"].get("FirstBossScreenX"));
         BossPostureBarData::firstBossScreenY = std::stof(ini["Boss Posture Bar"].get("FirstBossScreenY"));
         BossPostureBarData::nextBossBarDiffScreenY = std::stof(ini["Boss Posture Bar"].get("NextBossBarDiffScreenY"));
+
+		BossPostureBarData::drawPoiseBar = ini["Boss Posture Bar"].get("DrawPoiseBar") == "true";
+        BossPostureBarData::drawPoisonBar = ini["Boss Posture Bar"].get("DrawPoisonBar") == "true";
+		BossPostureBarData::drawRotBar = ini["Boss Posture Bar"].get("DrawRotBar") == "true";
+		BossPostureBarData::drawBleedBar = ini["Boss Posture Bar"].get("DrawBleedBar") == "true";
+		BossPostureBarData::drawBlightBar = ini["Boss Posture Bar"].get("DrawBlightBar") == "true";
+		BossPostureBarData::drawFrostBar = ini["Boss Posture Bar"].get("DrawFrostBar") == "true";
+		BossPostureBarData::drawSleepBar = ini["Boss Posture Bar"].get("DrawSleepBar") == "true";
+		BossPostureBarData::drawMadnessBar = ini["Boss Posture Bar"].get("DrawMadnessBar") == "true";
 
         //-----------------------------------------------------------------------------------
         //									    Entity Posture Bar
@@ -101,6 +165,15 @@ bool loadIni()
         PostureBarData::usePositionFixing = ini["Entity Posture Bar"].get("UsePositionFixing") == "true";
         PostureBarData::positionFixingMultiplierX = std::stof(ini["Entity Posture Bar"].get("PositionFixingMultiplierX"));
         PostureBarData::positionFixingMultiplierY = std::stof(ini["Entity Posture Bar"].get("PositionFixingMultiplierY"));
+
+		PostureBarData::drawPoiseBar = ini["Entity Posture Bar"].get("DrawPoiseBar") == "true";
+		PostureBarData::drawPoisonBar = ini["Entity Posture Bar"].get("DrawPoisonBar") == "true";
+		PostureBarData::drawRotBar = ini["Entity Posture Bar"].get("DrawRotBar") == "true";
+		PostureBarData::drawBleedBar = ini["Entity Posture Bar"].get("DrawBleedBar") == "true";
+		PostureBarData::drawBlightBar = ini["Entity Posture Bar"].get("DrawBlightBar") == "true";
+		PostureBarData::drawFrostBar = ini["Entity Posture Bar"].get("DrawFrostBar") == "true";
+		PostureBarData::drawSleepBar = ini["Entity Posture Bar"].get("DrawSleepBar") == "true";
+		PostureBarData::drawMadnessBar = ini["Entity Posture Bar"].get("DrawMadnessBar") == "true";
 
         //-----------------------------------------------------------------------------------
         //									    Experimental
@@ -360,6 +433,11 @@ void MainThread()
 
             if (moveVec.first != 0.f || moveVec.second != 0.f)
                 previousMoveVec = moveVec;
+        }
+
+        // reload ini settings for colors and bar toggles
+        if (GetAsyncKeyState(VK_RETURN)) {
+            loadIni();
         }
 
         std::this_thread::sleep_for(3ms);
