@@ -74,70 +74,70 @@ extern void Patch(BYTE* dst, BYTE* src, unsigned int size);
 template<typename T, size_t N>
 constexpr auto make_array(T value) -> std::array<T, N>
 {
-	std::array<T, N> a{};
-	for (auto& x : a)
-		x = value;
-	return a;
+    std::array<T, N> a{};
+    for (auto& x : a)
+        x = value;
+    return a;
 }
 
 inline std::vector<std::string> splitString(const std::string& inputString, const std::string& delimiter)
 {
-	std::regex re(delimiter);
-	std::sregex_token_iterator first{ inputString.begin(), inputString.end(), re, -1 }, last;//the '-1' is what makes the regex split (-1 := what was not matched)
-	return { first, last };
+    std::regex re(delimiter);
+    std::sregex_token_iterator first{ inputString.begin(), inputString.end(), re, -1 }, last;//the '-1' is what makes the regex split (-1 := what was not matched)
+    return { first, last };
 }
 
 namespace std
 {
-	inline std::string to_string(const ImVec2& vec2)
-	{
-		return "(" + std::to_string(vec2.x) + ", " + std::to_string(vec2.y) + ")";
-	}
+    inline std::string to_string(const ImVec2& vec2)
+    {
+        return "(" + std::to_string(vec2.x) + ", " + std::to_string(vec2.y) + ")";
+    }
 
-	inline std::string to_string(const ImVec4& vec4)
-	{
-		return "(" + std::to_string(vec4.x) + ", " + std::to_string(vec4.y) + ", " + std::to_string(vec4.z) + ", " + std::to_string(vec4.w) + ")";
-	}
+    inline std::string to_string(const ImVec4& vec4)
+    {
+        return "(" + std::to_string(vec4.x) + ", " + std::to_string(vec4.y) + ", " + std::to_string(vec4.z) + ", " + std::to_string(vec4.w) + ")";
+    }
 
-	template<typename T>
-	inline std::string to_string(const std::pair<T, T> pair)
-	{
-		return "{ " + std::to_string(pair.first) + ", " + std::to_string(pair.second) + " }";
-	}
+    template<typename T>
+    inline std::string to_string(const std::pair<T, T> pair)
+    {
+        return "{ " + std::to_string(pair.first) + ", " + std::to_string(pair.second) + " }";
+    }
 };
 
 namespace ER {
 
-	using namespace std::chrono_literals;
-	using namespace DirectX;
-	using namespace DirectX::PackedVector;
-	namespace fs = std::filesystem;
+    using namespace std::chrono_literals;
+    using namespace DirectX;
+    using namespace DirectX::PackedVector;
+    namespace fs = std::filesystem;
 
-	template<typename T> inline T RPM(uint64_t lpBaseAddress)
-	{
-		__try
-		{
-			T A{};
-			A = *(T*)(lpBaseAddress);
-			return A;
-		}
-		__except (EXCEPTION_EXECUTE_HANDLER)
-		{
-			return T{};
-		}
-	}
+    template<typename T> inline T RPM(uint64_t lpBaseAddress)
+    {
+        __try
+        {
+            T A{};
+            A = *(T*)(lpBaseAddress);
+            return A;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return T{};
+        }
+    }
 
-	template<typename T> inline void WPM(uint64_t lpBaseAddress, T Val)
-	{
-		__try
-		{
-			*(T*)(lpBaseAddress) = Val;
-			return;
-		}
-		__except (EXCEPTION_EXECUTE_HANDLER)
-		{
-		}
-	}
+    template<typename T> inline void WPM(uint64_t lpBaseAddress, T Val)
+    {
+        __try
+        {
+            *(T*)(lpBaseAddress) = Val;
+            return;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
 
-	static uint64_t dwGameBase = (uint64_t)GetModuleHandle(NULL);
+    static uint64_t dwGameBase = (uint64_t)GetModuleHandle(NULL);
 }

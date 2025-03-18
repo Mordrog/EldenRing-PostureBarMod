@@ -151,7 +151,7 @@ namespace ER
                 {
                     auto&& timePoint = std::chrono::steady_clock::now();
 
-					float staggerRatio = bossPostureBar->stagger / bossPostureBar->maxStagger;
+                    float staggerRatio = bossPostureBar->stagger / bossPostureBar->maxStagger;
 
                     float poisonRatio = bossPostureBar->poison / bossPostureBar->maxPoison;
                     float rotRatio = bossPostureBar->rot / bossPostureBar->maxRot;
@@ -212,53 +212,53 @@ namespace ER
                     {
                         if (bossPostureBar->drawPoiseBar && !bossPostureBar->isResetStagger) // Poise bar
                         {
-							drawBar(bossBarTexture, staggerColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, staggerRatio);
-							viewportPosition.y += height;
+                            drawBar(bossBarTexture, staggerColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, staggerRatio);
+                            viewportPosition.y += height;
                         }
                         if (bossPostureBar->drawPoisonBar) // Poison bar
                         {
-							drawBar(bossBarTexture, poisonColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, poisonRatio);
-							viewportPosition.y += height;
+                            drawBar(bossBarTexture, poisonColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, poisonRatio);
+                            viewportPosition.y += height;
                         }
                         if (bossPostureBar->drawRotBar) // Rot bar
                         {
-							drawBar(bossBarTexture, rotColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, rotRatio);
-							viewportPosition.y += height;
+                            drawBar(bossBarTexture, rotColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, rotRatio);
+                            viewportPosition.y += height;
                         }
                         if (bossPostureBar->drawBleedBar) // Bleed bar
                         {
-							drawBar(bossBarTexture, bleedColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, bleedRatio);
-							viewportPosition.y += height;
+                            drawBar(bossBarTexture, bleedColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, bleedRatio);
+                            viewportPosition.y += height;
                         }
-						if (bossPostureBar->drawBlightBar) // Blight bar
+                        if (bossPostureBar->drawBlightBar) // Blight bar
                         {
-							drawBar(bossBarTexture, blightColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, blightRatio);
-							viewportPosition.y += height;
+                            drawBar(bossBarTexture, blightColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, blightRatio);
+                            viewportPosition.y += height;
                         }
-						if (bossPostureBar->drawFrostBar) // Frost bar
+                        if (bossPostureBar->drawFrostBar) // Frost bar
                         {
-							drawBar(bossBarTexture, frostColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, frostRatio);
-							viewportPosition.y += height;
+                            drawBar(bossBarTexture, frostColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, frostRatio);
+                            viewportPosition.y += height;
                         }
-						if (bossPostureBar->drawSleepBar) // Sleep bar
+                        if (bossPostureBar->drawSleepBar) // Sleep bar
                         {
-							drawBar(bossBarTexture, sleepColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, sleepRatio);
-							viewportPosition.y += height;
-						}
-						if (bossPostureBar->drawMadnessBar) // Madness bar
+                            drawBar(bossBarTexture, sleepColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, sleepRatio);
+                            viewportPosition.y += height;
+                        }
+                        if (bossPostureBar->drawMadnessBar) // Madness bar
                         {
-							drawBar(bossBarTexture, madnessColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, madnessRatio);
+                            drawBar(bossBarTexture, madnessColor, viewportPosition, ImVec2(width, height), TextureData::bossOffset, madnessRatio);
                         }
                     }
                     else {
                         if (bossPostureBar->drawPoiseBar && !bossPostureBar->isResetStagger) // Poise bar
                         {
-							drawBar(staggerColor, viewportPosition, ImVec2(width, height), staggerRatio);
-							viewportPosition.y += height;
+                            drawBar(staggerColor, viewportPosition, ImVec2(width, height), staggerRatio);
+                            viewportPosition.y += height;
                         }
-						if (bossPostureBar->drawPoisonBar) // Poison bar
+                        if (bossPostureBar->drawPoisonBar) // Poison bar
                         {
-							drawBar(poisonColor, viewportPosition, ImVec2(width, height), poisonRatio);
+                            drawBar(poisonColor, viewportPosition, ImVec2(width, height), poisonRatio);
                             viewportPosition.y += height;
                         }
                         if (bossPostureBar->drawRotBar) // Rot bar
@@ -266,29 +266,29 @@ namespace ER
                             drawBar(rotColor, viewportPosition, ImVec2(width, height), rotRatio);
                             viewportPosition.y += height;
                         }
-						if (bossPostureBar->drawBleedBar) // Bleed bar
+                        if (bossPostureBar->drawBleedBar) // Bleed bar
                         {
-							drawBar(bleedColor, viewportPosition, ImVec2(width, height), bleedRatio);
-							viewportPosition.y += height;
+                            drawBar(bleedColor, viewportPosition, ImVec2(width, height), bleedRatio);
+                            viewportPosition.y += height;
                         }
-						if (bossPostureBar->drawBlightBar) // Blight bar
+                        if (bossPostureBar->drawBlightBar) // Blight bar
                         {
-							drawBar(blightColor, viewportPosition, ImVec2(width, height), blightRatio);
-							viewportPosition.y += height;
+                            drawBar(blightColor, viewportPosition, ImVec2(width, height), blightRatio);
+                            viewportPosition.y += height;
                         }
-						if (bossPostureBar->drawFrostBar) // Frost bar
+                        if (bossPostureBar->drawFrostBar) // Frost bar
                         {
-							drawBar(frostColor, viewportPosition, ImVec2(width, height), frostRatio);
-							viewportPosition.y += height;
+                            drawBar(frostColor, viewportPosition, ImVec2(width, height), frostRatio);
+                            viewportPosition.y += height;
                         }
-						if (bossPostureBar->drawSleepBar) // Sleep bar
+                        if (bossPostureBar->drawSleepBar) // Sleep bar
                         {
-							drawBar(sleepColor, viewportPosition, ImVec2(width, height), sleepRatio);
-							viewportPosition.y += height;
+                            drawBar(sleepColor, viewportPosition, ImVec2(width, height), sleepRatio);
+                            viewportPosition.y += height;
                         }
-						if (bossPostureBar->drawMadnessBar) // Madness bar
+                        if (bossPostureBar->drawMadnessBar) // Madness bar
                         {
-							drawBar(madnessColor, viewportPosition, ImVec2(width, height), madnessRatio);
+                            drawBar(madnessColor, viewportPosition, ImVec2(width, height), madnessRatio);
                         }
                     }
                 }
@@ -301,13 +301,13 @@ namespace ER
 
                     float staggerRatio = postureBar->stagger / postureBar->maxStagger;
 
-					float poisonRatio = postureBar->poison / postureBar->maxPoison;
-					float rotRatio = postureBar->rot / postureBar->maxRot;
-					float bleedRatio = postureBar->bleed / postureBar->maxBleed;
-					float blightRatio = postureBar->blight / postureBar->maxBlight;
-					float frostRatio = postureBar->frost / postureBar->maxFrost;
-					float sleepRatio = postureBar->sleep / postureBar->maxSleep;
-					float madnessRatio = postureBar->madness / postureBar->maxMadness;
+                    float poisonRatio = postureBar->poison / postureBar->maxPoison;
+                    float rotRatio = postureBar->rot / postureBar->maxRot;
+                    float bleedRatio = postureBar->bleed / postureBar->maxBleed;
+                    float blightRatio = postureBar->blight / postureBar->maxBlight;
+                    float frostRatio = postureBar->frost / postureBar->maxFrost;
+                    float sleepRatio = postureBar->sleep / postureBar->maxSleep;
+                    float madnessRatio = postureBar->madness / postureBar->maxMadness;
 
                     float distanceModifier = postureBar->distanceModifier;
 
@@ -362,97 +362,97 @@ namespace ER
 
                     auto staggerColor = getBarColor(postureBar->isStamina, staggerRatio);
 
-					auto poisonColor = mixBarColor(BarStyle::poisonMinColor, BarStyle::poisonMaxColor, poisonRatio);
-					auto rotColor = mixBarColor(BarStyle::rotMinColor, BarStyle::rotMaxColor, rotRatio);
-					auto bleedColor = mixBarColor(BarStyle::bleedMinColor, BarStyle::bleedMaxColor, bleedRatio);
-					auto blightColor = mixBarColor(BarStyle::blightMinColor, BarStyle::blightMaxColor, blightRatio);
-					auto frostColor = mixBarColor(BarStyle::frostMinColor, BarStyle::frostMaxColor, frostRatio);
-					auto sleepColor = mixBarColor(BarStyle::sleepMinColor, BarStyle::sleepMaxColor, sleepRatio);
-					auto madnessColor = mixBarColor(BarStyle::madnessMinColor, BarStyle::madnessMaxColor, madnessRatio);
+                    auto poisonColor = mixBarColor(BarStyle::poisonMinColor, BarStyle::poisonMaxColor, poisonRatio);
+                    auto rotColor = mixBarColor(BarStyle::rotMinColor, BarStyle::rotMaxColor, rotRatio);
+                    auto bleedColor = mixBarColor(BarStyle::bleedMinColor, BarStyle::bleedMaxColor, bleedRatio);
+                    auto blightColor = mixBarColor(BarStyle::blightMinColor, BarStyle::blightMaxColor, blightRatio);
+                    auto frostColor = mixBarColor(BarStyle::frostMinColor, BarStyle::frostMaxColor, frostRatio);
+                    auto sleepColor = mixBarColor(BarStyle::sleepMinColor, BarStyle::sleepMaxColor, sleepRatio);
+                    auto madnessColor = mixBarColor(BarStyle::madnessMinColor, BarStyle::madnessMaxColor, madnessRatio);
 
                     if (textureBarInit) {
                         if (postureBar->drawPoiseBar && !postureBar->isResetStagger) // Poise bar
                         {
-							drawBar(entityBarTexture, staggerColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, staggerRatio);
-							viewportPosition.y += height;
+                            drawBar(entityBarTexture, staggerColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, staggerRatio);
+                            viewportPosition.y += height;
                         }
-						if (postureBar->drawPoisonBar) // Poison bar
+                        if (postureBar->drawPoisonBar) // Poison bar
                         {
-							drawBar(entityBarTexture, poisonColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, poisonRatio);
-							viewportPosition.y += height;
-						}
-						if (postureBar->drawRotBar) // Rot bar
-                        {
-							drawBar(entityBarTexture, rotColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, rotRatio);
-							viewportPosition.y += height;
+                            drawBar(entityBarTexture, poisonColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, poisonRatio);
+                            viewportPosition.y += height;
                         }
-						if (postureBar->drawBleedBar) // Bleed bar
+                        if (postureBar->drawRotBar) // Rot bar
                         {
-							drawBar(entityBarTexture, bleedColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, bleedRatio);
-							viewportPosition.y += height;
+                            drawBar(entityBarTexture, rotColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, rotRatio);
+                            viewportPosition.y += height;
                         }
-						if (postureBar->drawBlightBar) // Blight bar
+                        if (postureBar->drawBleedBar) // Bleed bar
                         {
-							drawBar(entityBarTexture, blightColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, blightRatio);
-							viewportPosition.y += height;
+                            drawBar(entityBarTexture, bleedColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, bleedRatio);
+                            viewportPosition.y += height;
+                        }
+                        if (postureBar->drawBlightBar) // Blight bar
+                        {
+                            drawBar(entityBarTexture, blightColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, blightRatio);
+                            viewportPosition.y += height;
                         }
                         if (postureBar->drawFrostBar) // Frost bar
                         {
-							drawBar(entityBarTexture, frostColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, frostRatio);
-							viewportPosition.y += height;
+                            drawBar(entityBarTexture, frostColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, frostRatio);
+                            viewportPosition.y += height;
                         }
-						if (postureBar->drawSleepBar) // Sleep bar
+                        if (postureBar->drawSleepBar) // Sleep bar
                         {
-							drawBar(entityBarTexture, sleepColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, sleepRatio);
-							viewportPosition.y += height;
+                            drawBar(entityBarTexture, sleepColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, sleepRatio);
+                            viewportPosition.y += height;
                         }
-						if (postureBar->drawMadnessBar) // Madness bar
+                        if (postureBar->drawMadnessBar) // Madness bar
                         {
-							drawBar(entityBarTexture, madnessColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, madnessRatio);
-							viewportPosition.y += height;
+                            drawBar(entityBarTexture, madnessColor, viewportPosition, ImVec2(width, height), TextureData::entityOffset, madnessRatio);
+                            viewportPosition.y += height;
                         }
                     }
                     else
                     {
                         if (postureBar->drawPoiseBar && !postureBar->isResetStagger) // Poise bar
                         {
-							drawBar(staggerColor, viewportPosition, ImVec2(width, height), staggerRatio);
-							viewportPosition.y += height;
+                            drawBar(staggerColor, viewportPosition, ImVec2(width, height), staggerRatio);
+                            viewportPosition.y += height;
                         }
                         if (postureBar->drawPoisonBar) // Poison bar
                         {
-							drawBar(poisonColor, viewportPosition, ImVec2(width, height), poisonRatio);
-							viewportPosition.y += height;
+                            drawBar(poisonColor, viewportPosition, ImVec2(width, height), poisonRatio);
+                            viewportPosition.y += height;
                         }
                         if (postureBar->drawRotBar) // Rot bar
                         {
-							drawBar(rotColor, viewportPosition, ImVec2(width, height), rotRatio);
-							viewportPosition.y += height;
+                            drawBar(rotColor, viewportPosition, ImVec2(width, height), rotRatio);
+                            viewportPosition.y += height;
                         }
-						if (postureBar->drawBleedBar) // Bleed bar
+                        if (postureBar->drawBleedBar) // Bleed bar
                         {
-							drawBar(bleedColor, viewportPosition, ImVec2(width, height), bleedRatio);
-							viewportPosition.y += height;
+                            drawBar(bleedColor, viewportPosition, ImVec2(width, height), bleedRatio);
+                            viewportPosition.y += height;
                         }
-						if (postureBar->drawBlightBar) // Blight bar
+                        if (postureBar->drawBlightBar) // Blight bar
                         {
-							drawBar(blightColor, viewportPosition, ImVec2(width, height), blightRatio);
-							viewportPosition.y += height;
+                            drawBar(blightColor, viewportPosition, ImVec2(width, height), blightRatio);
+                            viewportPosition.y += height;
                         }
-						if (postureBar->drawFrostBar) // Frost bar
+                        if (postureBar->drawFrostBar) // Frost bar
                         {
-							drawBar(frostColor, viewportPosition, ImVec2(width, height), frostRatio);
-							viewportPosition.y += height;
+                            drawBar(frostColor, viewportPosition, ImVec2(width, height), frostRatio);
+                            viewportPosition.y += height;
                         }
-						if (postureBar->drawSleepBar) // Sleep bar
+                        if (postureBar->drawSleepBar) // Sleep bar
                         {
-							drawBar(sleepColor, viewportPosition, ImVec2(width, height), sleepRatio);
-							viewportPosition.y += height;
+                            drawBar(sleepColor, viewportPosition, ImVec2(width, height), sleepRatio);
+                            viewportPosition.y += height;
                         }
-						if (postureBar->drawMadnessBar) // Madness bar
+                        if (postureBar->drawMadnessBar) // Madness bar
                         {
-							drawBar(madnessColor, viewportPosition, ImVec2(width, height), madnessRatio);
-							viewportPosition.y += height;
+                            drawBar(madnessColor, viewportPosition, ImVec2(width, height), madnessRatio);
+                            viewportPosition.y += height;
                         }
                     }
                  }
@@ -625,20 +625,20 @@ namespace ER
                 bossStaggerBarData.stagger = !bossStaggerBarData.isStamina ? chrIns->chrModulelBag->staggerModule->stagger : chrIns->chrModulelBag->statModule->stamina;
                 bossStaggerBarData.isVisible = chrIns->chrModulelBag->statModule->health > 0;
 
-				bossStaggerBarData.maxPoison = static_cast<float>(chrIns->chrModulelBag->resistanceModule->poisonMax);
-				bossStaggerBarData.poison = bossStaggerBarData.maxPoison - static_cast<float>(chrIns->chrModulelBag->resistanceModule->poison);
-				bossStaggerBarData.maxRot = static_cast<float>(chrIns->chrModulelBag->resistanceModule->rotMax);
-				bossStaggerBarData.rot = bossStaggerBarData.maxRot - static_cast<float>(chrIns->chrModulelBag->resistanceModule->rot);
-				bossStaggerBarData.maxBleed = static_cast<float>(chrIns->chrModulelBag->resistanceModule->bleedMax);
-				bossStaggerBarData.bleed = bossStaggerBarData.maxBleed - static_cast<float>(chrIns->chrModulelBag->resistanceModule->bleed);
-				bossStaggerBarData.maxBlight = static_cast<float>(chrIns->chrModulelBag->resistanceModule->blightMax);
+                bossStaggerBarData.maxPoison = static_cast<float>(chrIns->chrModulelBag->resistanceModule->poisonMax);
+                bossStaggerBarData.poison = bossStaggerBarData.maxPoison - static_cast<float>(chrIns->chrModulelBag->resistanceModule->poison);
+                bossStaggerBarData.maxRot = static_cast<float>(chrIns->chrModulelBag->resistanceModule->rotMax);
+                bossStaggerBarData.rot = bossStaggerBarData.maxRot - static_cast<float>(chrIns->chrModulelBag->resistanceModule->rot);
+                bossStaggerBarData.maxBleed = static_cast<float>(chrIns->chrModulelBag->resistanceModule->bleedMax);
+                bossStaggerBarData.bleed = bossStaggerBarData.maxBleed - static_cast<float>(chrIns->chrModulelBag->resistanceModule->bleed);
+                bossStaggerBarData.maxBlight = static_cast<float>(chrIns->chrModulelBag->resistanceModule->blightMax);
                 bossStaggerBarData.blight = bossStaggerBarData.maxBlight - static_cast<float>(chrIns->chrModulelBag->resistanceModule->blight);
                 bossStaggerBarData.maxFrost = static_cast<float>(chrIns->chrModulelBag->resistanceModule->frostMax);
                 bossStaggerBarData.frost = bossStaggerBarData.maxFrost - static_cast<float>(chrIns->chrModulelBag->resistanceModule->frost);
-				bossStaggerBarData.maxSleep = static_cast<float>(chrIns->chrModulelBag->resistanceModule->sleepMax);
-				bossStaggerBarData.sleep = bossStaggerBarData.maxSleep - static_cast<float>(chrIns->chrModulelBag->resistanceModule->sleep);
-				bossStaggerBarData.maxMadness = static_cast<float>(chrIns->chrModulelBag->resistanceModule->madnessMax);
-				bossStaggerBarData.madness = bossStaggerBarData.maxMadness - static_cast<float>(chrIns->chrModulelBag->resistanceModule->madness);
+                bossStaggerBarData.maxSleep = static_cast<float>(chrIns->chrModulelBag->resistanceModule->sleepMax);
+                bossStaggerBarData.sleep = bossStaggerBarData.maxSleep - static_cast<float>(chrIns->chrModulelBag->resistanceModule->sleep);
+                bossStaggerBarData.maxMadness = static_cast<float>(chrIns->chrModulelBag->resistanceModule->madnessMax);
+                bossStaggerBarData.madness = bossStaggerBarData.maxMadness - static_cast<float>(chrIns->chrModulelBag->resistanceModule->madness);
 
                 if (previousBossStaggerBar && previousBossStaggerBar->entityHandle == entityHandle)
                 {
@@ -683,26 +683,26 @@ namespace ER
                 staggerBarData.entityHandle = entityHandle;
                 staggerBarData.isStamina = PostureBarData::useStaminaForNPC && chrIns->modelNumber == 0;
                 staggerBarData.maxStagger = !staggerBarData.isStamina ? chrIns->chrModulelBag->staggerModule->staggerMax : chrIns->chrModulelBag->statModule->staminaMax;
-				staggerBarData.stagger = !staggerBarData.isStamina ? chrIns->chrModulelBag->staggerModule->stagger : chrIns->chrModulelBag->statModule->stamina;
-				staggerBarData.screenX = feMan->entityHpBars[i].screenPosX;
+                staggerBarData.stagger = !staggerBarData.isStamina ? chrIns->chrModulelBag->staggerModule->stagger : chrIns->chrModulelBag->statModule->stamina;
+                staggerBarData.screenX = feMan->entityHpBars[i].screenPosX;
                 staggerBarData.screenY = feMan->entityHpBars[i].screenPosY;
                 staggerBarData.distanceModifier = feMan->entityHpBars[i].mod;
                 staggerBarData.isVisible = feMan->entityHpBars[i].isVisible && chrIns->chrModulelBag->statModule->health > 0;
 
-				staggerBarData.maxPoison = static_cast<float>(chrIns->chrModulelBag->resistanceModule->poisonMax);
-				staggerBarData.poison = staggerBarData.maxPoison - static_cast<float>(chrIns->chrModulelBag->resistanceModule->poison);
-				staggerBarData.maxRot = static_cast<float>(chrIns->chrModulelBag->resistanceModule->rotMax);
-				staggerBarData.rot = staggerBarData.maxRot - static_cast<float>(chrIns->chrModulelBag->resistanceModule->rot);
-				staggerBarData.maxBleed = static_cast<float>(chrIns->chrModulelBag->resistanceModule->bleedMax);
-				staggerBarData.bleed = staggerBarData.maxBleed - static_cast<float>(chrIns->chrModulelBag->resistanceModule->bleed);
-				staggerBarData.maxBlight = static_cast<float>(chrIns->chrModulelBag->resistanceModule->blightMax);
-				staggerBarData.blight = staggerBarData.maxBlight - static_cast<float>(chrIns->chrModulelBag->resistanceModule->blight);
+                staggerBarData.maxPoison = static_cast<float>(chrIns->chrModulelBag->resistanceModule->poisonMax);
+                staggerBarData.poison = staggerBarData.maxPoison - static_cast<float>(chrIns->chrModulelBag->resistanceModule->poison);
+                staggerBarData.maxRot = static_cast<float>(chrIns->chrModulelBag->resistanceModule->rotMax);
+                staggerBarData.rot = staggerBarData.maxRot - static_cast<float>(chrIns->chrModulelBag->resistanceModule->rot);
+                staggerBarData.maxBleed = static_cast<float>(chrIns->chrModulelBag->resistanceModule->bleedMax);
+                staggerBarData.bleed = staggerBarData.maxBleed - static_cast<float>(chrIns->chrModulelBag->resistanceModule->bleed);
+                staggerBarData.maxBlight = static_cast<float>(chrIns->chrModulelBag->resistanceModule->blightMax);
+                staggerBarData.blight = staggerBarData.maxBlight - static_cast<float>(chrIns->chrModulelBag->resistanceModule->blight);
                 staggerBarData.maxFrost = static_cast<float>(chrIns->chrModulelBag->resistanceModule->frostMax);
                 staggerBarData.frost = staggerBarData.maxFrost - static_cast<float>(chrIns->chrModulelBag->resistanceModule->frost);
-				staggerBarData.maxSleep = static_cast<float>(chrIns->chrModulelBag->resistanceModule->sleepMax);
-				staggerBarData.sleep = staggerBarData.maxSleep - static_cast<float>(chrIns->chrModulelBag->resistanceModule->sleep);
-				staggerBarData.maxMadness = static_cast<float>(chrIns->chrModulelBag->resistanceModule->madnessMax);
-				staggerBarData.madness = staggerBarData.maxMadness - static_cast<float>(chrIns->chrModulelBag->resistanceModule->madness);
+                staggerBarData.maxSleep = static_cast<float>(chrIns->chrModulelBag->resistanceModule->sleepMax);
+                staggerBarData.sleep = staggerBarData.maxSleep - static_cast<float>(chrIns->chrModulelBag->resistanceModule->sleep);
+                staggerBarData.maxMadness = static_cast<float>(chrIns->chrModulelBag->resistanceModule->madnessMax);
+                staggerBarData.madness = staggerBarData.maxMadness - static_cast<float>(chrIns->chrModulelBag->resistanceModule->madness);
 
                 staggerBarData.gameUiUpdateTimePoint = timePoint;
                 staggerBarData.gamePreviousUiUpdateTimePoint = timePoint;
