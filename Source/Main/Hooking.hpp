@@ -76,6 +76,7 @@ namespace ER
 			int frost;
 			int sleep;
 			int madness;
+
 			int poisonMax;
 			int rotMax;
 			int bleedMax;
@@ -83,6 +84,7 @@ namespace ER
 			int frostMax;
 			int sleepMax;
 			int madnessMax;
+
 			float poisonMod;
 			float rotMod;
 			float bleedMod;
@@ -90,6 +92,7 @@ namespace ER
 			float frostMod;
 			float sleepMod;
 			float madnessMod;
+
 			float poisonMul;
 			float rotMul;
 			float bleedMul;

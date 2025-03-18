@@ -28,8 +28,24 @@ namespace ER
 		int displayId = -1;
 		bool isStamina = false;
 		bool isVisible = false;
+
 		float maxStagger = 0.0f;
 		float stagger = 0.0f;
+
+		float maxPoison = 0.0f;
+		float poison = 0.0f;
+		float maxRot = 0.0f;
+		float rot = 0.0f;
+		float maxBleed = 0.0f;
+		float bleed = 0.0f;
+		float maxBlight = 0.0f;
+		float blight = 0.0f;
+		float maxFrost = 0.0f;
+		float frost = 0.0f;
+		float maxSleep = 0.0f;
+		float sleep = 0.0f;
+		float maxMadness = 0.0f;
+		float madness = 0.0f;
 
 		// Stagger reset
 		float previousStagger = 1.0f; // set to 1, as 0 would conflict with checking for posture break
@@ -45,6 +61,15 @@ namespace ER
 		static inline float firstBossScreenX = 963.0f;
 		static inline float firstBossScreenY = 945.0f;
 		static inline float nextBossBarDiffScreenY = 55.0f;
+
+		static inline bool drawPoiseBar =	true;
+		static inline bool drawPoisonBar =	true;
+		static inline bool drawRotBar =		true;
+		static inline bool drawBleedBar =	true;
+		static inline bool drawBlightBar =	true;
+		static inline bool drawFrostBar =	true;
+		static inline bool drawSleepBar =	true;
+		static inline bool drawMadnessBar = true;
 	};
 
 	struct PostureBarData
@@ -55,8 +80,24 @@ namespace ER
 		float screenY = 0.0f;
 		float distanceModifier = 0.0f;
 		bool isVisible = false;
+
 		float maxStagger = 0.0f;
 		float stagger = 0.0f;
+
+		float maxPoison = 0.0f;
+		float poison = 0.0f;
+		float maxRot = 0.0f;
+		float rot = 0.0f;
+		float maxBleed = 0.0f;
+		float bleed = 0.0f;
+		float maxBlight = 0.0f;
+		float blight = 0.0f;
+		float maxFrost = 0.0f;
+		float frost = 0.0f;
+		float maxSleep = 0.0f;
+		float sleep = 0.0f;
+		float maxMadness = 0.0f;
+		float madness = 0.0f;
 
 		// Position Fixing by movement velocity
 		float previousScreenX = -1.0f;
@@ -84,6 +125,15 @@ namespace ER
 		static inline bool  usePositionFixing = true;
 		static inline double positionFixingMultiplierX = 10.0f;
 		static inline double positionFixingMultiplierY = 10.0f;
+
+		static inline bool drawPoiseBar = true;
+		static inline bool drawPoisonBar = true;
+		static inline bool drawRotBar = true;
+		static inline bool drawBleedBar = true;
+		static inline bool drawBlightBar = true;
+		static inline bool drawFrostBar = true;
+		static inline bool drawSleepBar = true;
+		static inline bool drawMadnessBar = true;
 	};
 
 	struct ScreenParams
@@ -128,6 +178,21 @@ namespace ER
 		static inline ImVec4 staggerMinColor = { 255, 255, 0, 255 };
 		static inline ImVec4 staminaMaxColor = { 80, 200, 104, 255 };
 		static inline ImVec4 staminaMinColor = { 80, 200, 104, 255 };
+
+		static inline ImVec4 poisonMaxColor =  { 100, 250, 85, 255 };
+		static inline ImVec4 poisonMinColor =  { 100, 250, 85, 255 };
+		static inline ImVec4 rotMaxColor =     { 255, 127, 0, 255 };
+		static inline ImVec4 rotMinColor =     { 255, 127, 0, 255 };
+		static inline ImVec4 bleedMaxColor =   { 255, 0, 0, 255 }; 
+		static inline ImVec4 bleedMinColor =   { 255, 0, 0, 255 }; 
+		static inline ImVec4 blightMaxColor =  { 200, 200, 0, 255 };
+		static inline ImVec4 blightMinColor =  { 200, 200, 0, 255 };
+		static inline ImVec4 frostMaxColor =   { 40, 225, 255, 255 };
+		static inline ImVec4 frostMinColor =   { 40, 225, 255, 255 };
+		static inline ImVec4 sleepMaxColor =   { 240, 0, 200, 255 };
+		static inline ImVec4 sleepMinColor =   { 240, 0, 200, 255 };
+		static inline ImVec4 madnessMaxColor = { 255, 255, 0, 255 };
+		static inline ImVec4 madnessMinColor = { 255, 255, 0, 255 };
 	};
 
 	typedef std::pair<ImVec2 /* top-left */, ImVec2 /* bot-right*/> FillTextureOffset;
@@ -158,6 +223,7 @@ namespace ER
 		// Draws UI posture bars, use after starting imgui new frame
 		void Draw();
 		ImColor getBarColor(bool isStamina, float fillRatio);
+		ImColor mixBarColor(ImVec4& minColor, ImVec4& maxColor, float fillRatio);
 		void drawBar(const TextureBar& textureBar, const ImColor& color, const ImVec2& position, const ImVec2& size, const std::pair<ImVec2 /* top-left */, ImVec2 /* bot-right */>& fillOffset, float fillRatio);
 		void drawBar(const ImColor& color, const ImVec2& position, const ImVec2& size, float fillRatio);
 

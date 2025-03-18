@@ -22,6 +22,7 @@ namespace ER
 	inline std::atomic_bool g_KillSwitch = FALSE;
 	inline bool offsetTesting = FALSE;
 	inline float offsetSpeed = 0.5f;
+	inline float barHeightMultiplier = 1.0f;
 	inline EDebugTestState debugState = EDebugTestState::GameScreenOffset;
 
 	inline std::string dllPath = "";
