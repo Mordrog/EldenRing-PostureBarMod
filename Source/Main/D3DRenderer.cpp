@@ -777,7 +777,7 @@ namespace ER
 
 	void D3DRenderer::HookExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists, ID3D12CommandList* ppCommandLists) 
 	{
-		if (!g_D3DRenderer->m_CommandQueue)
+		if (!g_D3DRenderer->m_CommandQueue && queue->GetDesc().Type == D3D12_COMMAND_LIST_TYPE_DIRECT)
 			g_D3DRenderer->m_CommandQueue = queue;
 
 		g_D3DRenderer->oExecuteCommandLists(queue, NumCommandLists, ppCommandLists);
