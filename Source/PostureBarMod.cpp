@@ -72,9 +72,6 @@ bool loadIni()
         assert(staminaColorMin.size() == 4);
         BarStyle::staminaMinColor = ImVec4(std::stof(staminaColorMin[0]), std::stof(staminaColorMin[1]), std::stof(staminaColorMin[2]), std::stof(staminaColorMin[3]));
 
-        barHeightMultiplier = std::stof(ini["Style"].get("BarHeightMultiplier"));
-        assert(barHeightMultiplier > 0.f);
-
         auto&& poisonColorMax = splitString(ini["Style"].get("PoisonColorMax"), ",");
         assert(poisonColorMax.size() == 4);
         BarStyle::poisonMaxColor = ImVec4(std::stof(poisonColorMax[0]), std::stof(poisonColorMax[1]), std::stof(poisonColorMax[2]), std::stof(poisonColorMax[3]));
@@ -139,41 +136,59 @@ bool loadIni()
         BossPostureBarData::firstBossScreenY = std::stof(ini["Boss Posture Bar"].get("FirstBossScreenY"));
         BossPostureBarData::nextBossBarDiffScreenY = std::stof(ini["Boss Posture Bar"].get("NextBossBarDiffScreenY"));
 
-        BossPostureBarData::drawStaggerBar = ini["Boss Posture Bar"].get("DrawPoiseBar") == "true";
-        BossPostureBarData::drawPoisonBar = ini["Boss Posture Bar"].get("DrawPoisonBar") == "true";
-        BossPostureBarData::drawRotBar = ini["Boss Posture Bar"].get("DrawRotBar") == "true";
-        BossPostureBarData::drawBleedBar = ini["Boss Posture Bar"].get("DrawBleedBar") == "true";
-        BossPostureBarData::drawBlightBar = ini["Boss Posture Bar"].get("DrawBlightBar") == "true";
-        BossPostureBarData::drawFrostBar = ini["Boss Posture Bar"].get("DrawFrostBar") == "true";
-        BossPostureBarData::drawSleepBar = ini["Boss Posture Bar"].get("DrawSleepBar") == "true";
-        BossPostureBarData::drawMadnessBar = ini["Boss Posture Bar"].get("DrawMadnessBar") == "true";
+        BossPostureBarData::drawBar[EERDataType::Stagger] = true;
+        BossPostureBarData::drawBar[EERDataType::Stamina] = true;
+        BossPostureBarData::drawBar[EERDataType::Poison] = ini["Boss Posture Bar"].get("DrawPoisonBar") == "true";
+        BossPostureBarData::drawBar[EERDataType::Rot] = ini["Boss Posture Bar"].get("DrawRotBar") == "true";
+        BossPostureBarData::drawBar[EERDataType::Bleed] = ini["Boss Posture Bar"].get("DrawBleedBar") == "true";
+        BossPostureBarData::drawBar[EERDataType::Blight] = ini["Boss Posture Bar"].get("DrawBlightBar") == "true";
+        BossPostureBarData::drawBar[EERDataType::Frost] = ini["Boss Posture Bar"].get("DrawFrostBar") == "true";
+        BossPostureBarData::drawBar[EERDataType::Sleep] = ini["Boss Posture Bar"].get("DrawSleepBar") == "true";
+        BossPostureBarData::drawBar[EERDataType::Madness] = ini["Boss Posture Bar"].get("DrawMadnessBar") == "true";
+        for (size_t i = static_cast<size_t>(EERDataType::STATUSES) + 1; i < static_cast<size_t>(EERDataType::MAX); ++i)
+        {
+            BossPostureBarData::drawStatusBars |= BossPostureBarData::drawBar[static_cast<EERDataType>(i)];
+        }
+        BossPostureBarData::statusBarWidth = std::stof(ini["Boss Posture Bar"].get("StatusBarWidth"));
+        BossPostureBarData::statusBarHeight = std::stof(ini["Boss Posture Bar"].get("StatusBarHeight"));
+        BossPostureBarData::firstStatusBarDiffScreenY = std::stof(ini["Boss Posture Bar"].get("FirstStatusBarDiffScreenY"));
+        BossPostureBarData::nextStatusBarDiffScreenY = std::stof(ini["Boss Posture Bar"].get("NextStatusBarDiffScreenY"));
 
         //-----------------------------------------------------------------------------------
         //                                        Entity Posture Bar
         //-----------------------------------------------------------------------------------
-        PostureBarData::drawBars = ini["Entity Posture Bar"].get("DrawBars") == "true";
-        PostureBarData::useStaminaForNPC = ini["Entity Posture Bar"].get("UseStaminaForNPC") == "true";
-        PostureBarData::barWidth = std::stof(ini["Entity Posture Bar"].get("BarWidth"));
-        PostureBarData::barHeight = std::stof(ini["Entity Posture Bar"].get("BarHeight"));
-        PostureBarData::resetStaggerTotalTime = std::stof(ini["Entity Posture Bar"].get("ResetStaggerTotalTime"));
-        PostureBarData::offsetScreenX = std::stof(ini["Entity Posture Bar"].get("OffsetScreenX"));
-        PostureBarData::offsetScreenY = std::stof(ini["Entity Posture Bar"].get("OffsetScreenY"));
-        PostureBarData::leftScreenThreshold = std::stof(ini["Entity Posture Bar"].get("LeftScreenThreshold"));
-        PostureBarData::rightScreenThreshold = std::stof(ini["Entity Posture Bar"].get("RightScreenThreshold"));
-        PostureBarData::topScreenThreshold = std::stof(ini["Entity Posture Bar"].get("TopScreenThreshold"));
-        PostureBarData::bottomScreenThreshold = std::stof(ini["Entity Posture Bar"].get("BottomScreenThreshold"));
-        PostureBarData::usePositionFixing = ini["Entity Posture Bar"].get("UsePositionFixing") == "true";
-        PostureBarData::positionFixingMultiplierX = std::stof(ini["Entity Posture Bar"].get("PositionFixingMultiplierX"));
-        PostureBarData::positionFixingMultiplierY = std::stof(ini["Entity Posture Bar"].get("PositionFixingMultiplierY"));
+        EntityPostureBarData::drawBars = ini["Entity Posture Bar"].get("DrawBars") == "true";
+        EntityPostureBarData::useStaminaForNPC = ini["Entity Posture Bar"].get("UseStaminaForNPC") == "true";
+        EntityPostureBarData::barWidth = std::stof(ini["Entity Posture Bar"].get("BarWidth"));
+        EntityPostureBarData::barHeight = std::stof(ini["Entity Posture Bar"].get("BarHeight"));
+        EntityPostureBarData::resetStaggerTotalTime = std::stof(ini["Entity Posture Bar"].get("ResetStaggerTotalTime"));
+        EntityPostureBarData::offsetScreenX = std::stof(ini["Entity Posture Bar"].get("OffsetScreenX"));
+        EntityPostureBarData::offsetScreenY = std::stof(ini["Entity Posture Bar"].get("OffsetScreenY"));
+        EntityPostureBarData::leftScreenThreshold = std::stof(ini["Entity Posture Bar"].get("LeftScreenThreshold"));
+        EntityPostureBarData::rightScreenThreshold = std::stof(ini["Entity Posture Bar"].get("RightScreenThreshold"));
+        EntityPostureBarData::topScreenThreshold = std::stof(ini["Entity Posture Bar"].get("TopScreenThreshold"));
+        EntityPostureBarData::bottomScreenThreshold = std::stof(ini["Entity Posture Bar"].get("BottomScreenThreshold"));
+        EntityPostureBarData::usePositionFixing = ini["Entity Posture Bar"].get("UsePositionFixing") == "true";
+        EntityPostureBarData::positionFixingMultiplierX = std::stof(ini["Entity Posture Bar"].get("PositionFixingMultiplierX"));
+        EntityPostureBarData::positionFixingMultiplierY = std::stof(ini["Entity Posture Bar"].get("PositionFixingMultiplierY"));
 
-        PostureBarData::drawPoiseBar = ini["Entity Posture Bar"].get("DrawPoiseBar") == "true";
-        PostureBarData::drawPoisonBar = ini["Entity Posture Bar"].get("DrawPoisonBar") == "true";
-        PostureBarData::drawRotBar = ini["Entity Posture Bar"].get("DrawRotBar") == "true";
-        PostureBarData::drawBleedBar = ini["Entity Posture Bar"].get("DrawBleedBar") == "true";
-        PostureBarData::drawBlightBar = ini["Entity Posture Bar"].get("DrawBlightBar") == "true";
-        PostureBarData::drawFrostBar = ini["Entity Posture Bar"].get("DrawFrostBar") == "true";
-        PostureBarData::drawSleepBar = ini["Entity Posture Bar"].get("DrawSleepBar") == "true";
-        PostureBarData::drawMadnessBar = ini["Entity Posture Bar"].get("DrawMadnessBar") == "true";
+        EntityPostureBarData::drawBar[EERDataType::Stagger] = true;
+        EntityPostureBarData::drawBar[EERDataType::Stamina] = true;
+        EntityPostureBarData::drawBar[EERDataType::Poison] = ini["Entity Posture Bar"].get("DrawPoisonBar") == "true";
+        EntityPostureBarData::drawBar[EERDataType::Rot] = ini["Entity Posture Bar"].get("DrawRotBar") == "true";
+        EntityPostureBarData::drawBar[EERDataType::Bleed] = ini["Entity Posture Bar"].get("DrawBleedBar") == "true";
+        EntityPostureBarData::drawBar[EERDataType::Blight] = ini["Entity Posture Bar"].get("DrawBlightBar") == "true";
+        EntityPostureBarData::drawBar[EERDataType::Frost] = ini["Entity Posture Bar"].get("DrawFrostBar") == "true";
+        EntityPostureBarData::drawBar[EERDataType::Sleep] = ini["Entity Posture Bar"].get("DrawSleepBar") == "true";
+        EntityPostureBarData::drawBar[EERDataType::Madness] = ini["Entity Posture Bar"].get("DrawMadnessBar") == "true";
+        for (size_t i = static_cast<size_t>(EERDataType::STATUSES) + 1; i < static_cast<size_t>(EERDataType::MAX); ++i)
+        {
+            EntityPostureBarData::drawStatusBars |= EntityPostureBarData::drawBar[static_cast<EERDataType>(i)];
+        }
+        EntityPostureBarData::statusBarWidth = std::stof(ini["Entity Posture Bar"].get("StatusBarWidth"));
+        EntityPostureBarData::statusBarHeight = std::stof(ini["Entity Posture Bar"].get("StatusBarHeight"));
+        EntityPostureBarData::firstStatusBarDiffScreenY = std::stof(ini["Entity Posture Bar"].get("FirstStatusBarDiffScreenY"));
+        EntityPostureBarData::nextStatusBarDiffScreenY = std::stof(ini["Entity Posture Bar"].get("NextStatusBarDiffScreenY"));
 
         //-----------------------------------------------------------------------------------
         //                                        Experimental
@@ -240,21 +255,45 @@ bool loadIni()
     Logger::log("\t\tFirstBossScreenX: " + std::to_string(BossPostureBarData::firstBossScreenX));
     Logger::log("\t\tFirstBossScreenY: " + std::to_string(BossPostureBarData::firstBossScreenY));
     Logger::log("\t\tNextBossBarDiffScreenY: " + std::to_string(BossPostureBarData::nextBossBarDiffScreenY));
+    Logger::log("\t\tDrawPoisonBar: " + std::to_string(BossPostureBarData::drawBar[EERDataType::Poison]));
+    Logger::log("\t\tDrawRotBar: " + std::to_string(BossPostureBarData::drawBar[EERDataType::Rot]));
+    Logger::log("\t\tDrawBleedBar: " + std::to_string(BossPostureBarData::drawBar[EERDataType::Bleed]));
+    Logger::log("\t\tDrawBlightBar: " + std::to_string(BossPostureBarData::drawBar[EERDataType::Blight]));
+    Logger::log("\t\tDrawFrostBar: " + std::to_string(BossPostureBarData::drawBar[EERDataType::Frost]));
+    Logger::log("\t\tDrawSleepBar: " + std::to_string(BossPostureBarData::drawBar[EERDataType::Sleep]));
+    Logger::log("\t\tDrawMadnessBar: " + std::to_string(BossPostureBarData::drawBar[EERDataType::Madness]));
+    Logger::log("\t\tDrawStatusBars: " + std::to_string(BossPostureBarData::drawStatusBars));
+    Logger::log("\t\tStatusBarWidth: " + std::to_string(BossPostureBarData::statusBarWidth));
+    Logger::log("\t\tStatusBarHeight: " + std::to_string(BossPostureBarData::statusBarHeight));
+    Logger::log("\t\tFirstStatusBarDiffScreenY: " + std::to_string(BossPostureBarData::firstStatusBarDiffScreenY));
+    Logger::log("\t\tNextStatusBarDiffScreenY: " + std::to_string(BossPostureBarData::nextStatusBarDiffScreenY));
     Logger::log("\tEntity Posture Bar:");
-    Logger::log("\t\tDrawBars: " + std::to_string(PostureBarData::drawBars));
-    Logger::log("\t\tUseStaminaForNPC: " + std::to_string(PostureBarData::useStaminaForNPC));
-    Logger::log("\t\tBarWidth: " + std::to_string(PostureBarData::barWidth));
-    Logger::log("\t\tBarHeight: " + std::to_string(PostureBarData::barHeight));
-    Logger::log("\t\tResetStaggerTotalTime: " + std::to_string(PostureBarData::resetStaggerTotalTime));
-    Logger::log("\t\tOffsetScreenX: " + std::to_string(PostureBarData::offsetScreenX));
-    Logger::log("\t\tOffsetScreenY: " + std::to_string(PostureBarData::offsetScreenY));
-    Logger::log("\t\tLeftScreenThreshold: " + std::to_string(PostureBarData::leftScreenThreshold));
-    Logger::log("\t\tRightScreenThreshold: " + std::to_string(PostureBarData::rightScreenThreshold));
-    Logger::log("\t\tTopScreenThreshold: " + std::to_string(PostureBarData::topScreenThreshold));
-    Logger::log("\t\tBottomScreenThreshold: " + std::to_string(PostureBarData::bottomScreenThreshold));
-    Logger::log("\t\tUsePositionFixing: " + std::to_string(PostureBarData::usePositionFixing));
-    Logger::log("\t\tPositionFixingMultiplierX: " + std::to_string(PostureBarData::positionFixingMultiplierX));
-    Logger::log("\t\tPositionFixingMultiplierY: " + std::to_string(PostureBarData::positionFixingMultiplierY));
+    Logger::log("\t\tDrawBars: " + std::to_string(EntityPostureBarData::drawBars));
+    Logger::log("\t\tUseStaminaForNPC: " + std::to_string(EntityPostureBarData::useStaminaForNPC));
+    Logger::log("\t\tBarWidth: " + std::to_string(EntityPostureBarData::barWidth));
+    Logger::log("\t\tBarHeight: " + std::to_string(EntityPostureBarData::barHeight));
+    Logger::log("\t\tResetStaggerTotalTime: " + std::to_string(EntityPostureBarData::resetStaggerTotalTime));
+    Logger::log("\t\tOffsetScreenX: " + std::to_string(EntityPostureBarData::offsetScreenX));
+    Logger::log("\t\tOffsetScreenY: " + std::to_string(EntityPostureBarData::offsetScreenY));
+    Logger::log("\t\tLeftScreenThreshold: " + std::to_string(EntityPostureBarData::leftScreenThreshold));
+    Logger::log("\t\tRightScreenThreshold: " + std::to_string(EntityPostureBarData::rightScreenThreshold));
+    Logger::log("\t\tTopScreenThreshold: " + std::to_string(EntityPostureBarData::topScreenThreshold));
+    Logger::log("\t\tBottomScreenThreshold: " + std::to_string(EntityPostureBarData::bottomScreenThreshold));
+    Logger::log("\t\tUsePositionFixing: " + std::to_string(EntityPostureBarData::usePositionFixing));
+    Logger::log("\t\tPositionFixingMultiplierX: " + std::to_string(EntityPostureBarData::positionFixingMultiplierX));
+    Logger::log("\t\tPositionFixingMultiplierY: " + std::to_string(EntityPostureBarData::positionFixingMultiplierY));
+    Logger::log("\t\tDrawPoisonBar: " + std::to_string(EntityPostureBarData::drawBar[EERDataType::Poison]));
+    Logger::log("\t\tDrawRotBar: " + std::to_string(EntityPostureBarData::drawBar[EERDataType::Rot]));
+    Logger::log("\t\tDrawBleedBar: " + std::to_string(EntityPostureBarData::drawBar[EERDataType::Bleed]));
+    Logger::log("\t\tDrawBlightBar: " + std::to_string(EntityPostureBarData::drawBar[EERDataType::Blight]));
+    Logger::log("\t\tDrawFrostBar: " + std::to_string(EntityPostureBarData::drawBar[EERDataType::Frost]));
+    Logger::log("\t\tDrawSleepBar: " + std::to_string(EntityPostureBarData::drawBar[EERDataType::Sleep]));
+    Logger::log("\t\tDrawMadnessBar: " + std::to_string(EntityPostureBarData::drawBar[EERDataType::Madness]));
+    Logger::log("\t\tDrawStatusBars: " + std::to_string(EntityPostureBarData::drawStatusBars));
+    Logger::log("\t\tStatusBarWidth: " + std::to_string(EntityPostureBarData::statusBarWidth));
+    Logger::log("\t\tStatusBarHeight: " + std::to_string(EntityPostureBarData::statusBarHeight));
+    Logger::log("\t\tFirstStatusBarDiffScreenY: " + std::to_string(EntityPostureBarData::firstStatusBarDiffScreenY));
+    Logger::log("\t\tNextStatusBarDiffScreenY: " + std::to_string(EntityPostureBarData::nextStatusBarDiffScreenY));
     Logger::log("\tExperimental:");
     Logger::log("\t\tHideBarsOnMenu: " + std::to_string(hideBarsOnMenu));
     Logger::log("\t\tDrawBar: " + std::to_string(PlayerPostureBarData::drawBar));
@@ -290,16 +329,16 @@ bool saveTestOffsetToIni()
                 ini["Boss Posture Bar"]["FirstBossScreenY"] = std::to_string(BossPostureBarData::firstBossScreenY);
                 break;
             case EntityBarOffset:
-                ini["Entity Posture Bar"]["OffsetScreenX"] = std::to_string(PostureBarData::offsetScreenX);
-                ini["Entity Posture Bar"]["OffsetScreenY"] = std::to_string(PostureBarData::offsetScreenY);
+                ini["Entity Posture Bar"]["OffsetScreenX"] = std::to_string(EntityPostureBarData::offsetScreenX);
+                ini["Entity Posture Bar"]["OffsetScreenY"] = std::to_string(EntityPostureBarData::offsetScreenY);
                 break;
             case GameScreenOffset:
                 ini["General"]["ScreenPositionX"] = std::to_string(ScreenParams::posX);
                 ini["General"]["ScreenPositionY"] = std::to_string(ScreenParams::posY);
                 break;
             case PosFixingMultiplier:
-                ini["Entity Posture Bar"]["PositionFixingMultiplierX"] = std::to_string((float)PostureBarData::positionFixingMultiplierX);
-                ini["Entity Posture Bar"]["PositionFixingMultiplierY"] = std::to_string((float)PostureBarData::positionFixingMultiplierY);
+                ini["Entity Posture Bar"]["PositionFixingMultiplierX"] = std::to_string((float)EntityPostureBarData::positionFixingMultiplierX);
+                ini["Entity Posture Bar"]["PositionFixingMultiplierY"] = std::to_string((float)EntityPostureBarData::positionFixingMultiplierY);
                 break;
         }
 
@@ -409,16 +448,16 @@ void MainThread()
                     BossPostureBarData::firstBossScreenY += moveVec.second * offsetSpeed;
                     break;
                 case EntityBarOffset:
-                    PostureBarData::offsetScreenX += moveVec.first * offsetSpeed;
-                    PostureBarData::offsetScreenY += moveVec.second * offsetSpeed;
+                    EntityPostureBarData::offsetScreenX += moveVec.first * offsetSpeed;
+                    EntityPostureBarData::offsetScreenY += moveVec.second * offsetSpeed;
                     break;
                 case GameScreenOffset:
                     ScreenParams::posX += moveVec.first * offsetSpeed;
                     ScreenParams::posY += moveVec.second * offsetSpeed;
                     break;
                 case PosFixingMultiplier:
-                    PostureBarData::positionFixingMultiplierX = std::clamp(PostureBarData::positionFixingMultiplierX + (moveVec.first * std::ceil(offsetSpeed) * 0.1), 0.0, 20.0);
-                    PostureBarData::positionFixingMultiplierY = std::clamp(PostureBarData::positionFixingMultiplierY - (moveVec.second * std::ceil(offsetSpeed) * 0.1), 0.0, 20.0);
+                    EntityPostureBarData::positionFixingMultiplierX = std::clamp(EntityPostureBarData::positionFixingMultiplierX + (moveVec.first * std::ceil(offsetSpeed) * 0.1), 0.0, 20.0);
+                    EntityPostureBarData::positionFixingMultiplierY = std::clamp(EntityPostureBarData::positionFixingMultiplierY - (moveVec.second * std::ceil(offsetSpeed) * 0.1), 0.0, 20.0);
                     break;
             }
 

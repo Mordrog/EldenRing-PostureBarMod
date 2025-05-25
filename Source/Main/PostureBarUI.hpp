@@ -3,6 +3,66 @@
 
 namespace ER 
 {
+    enum class EPostureBarType
+    {
+        Entity,
+        Boss
+    };
+
+    enum class EERDataType
+    {
+        Stagger,
+        Stamina,
+        STATUSES,
+        Poison,
+        Rot,
+        Bleed,
+        Blight,
+        Frost,
+        Sleep,
+        Madness,
+        MAX,
+    };
+
+    inline std::string to_string(const EERDataType erDataType)
+    {
+        switch (erDataType)
+        {
+        case EERDataType::Stagger:
+            return "Stagger";
+        case EERDataType::Stamina:
+            return "Stamina";
+        case EERDataType::Poison:
+            return "Poison";
+        case EERDataType::Rot:
+            return "Rot";
+        case EERDataType::Bleed:
+            return "Bleed";
+        case EERDataType::Blight:
+            return "Blight";
+        case EERDataType::Frost:
+            return "Frost";
+        case EERDataType::Sleep:
+            return "Sleep";
+        case EERDataType::Madness:
+            return "Madness";
+        default:
+            return "";
+        }
+    }
+
+    struct BarData
+    {
+        float value = 0.0f;
+        float maxValue = 0.0f;
+
+        void SetValue(float inValue, float inMaxValue) { value = inValue, maxValue = inMaxValue; };
+        void SetValue(int inValue, int inMaxValue) { value = static_cast<float>(inValue), maxValue = static_cast<float>(inMaxValue); };
+        void SetInverseValue(int inValue, int inMaxValue) { maxValue = static_cast<float>(inMaxValue); value = maxValue - static_cast<float>(inValue); };
+        float GetRatio() { return value / maxValue; }
+        bool IsValueMax() { return value == maxValue; }
+    };
+
     struct PlayerPostureBarData
     {
         float maxStagger = 0.0f;
@@ -20,6 +80,10 @@ namespace ER
         static inline float resetStaggerTotalTime = 2.0f;
         static inline float screenX = 963.0f;
         static inline float screenY = 100.0f;
+
+#ifdef DEBUGLOG
+        void LogDebug();
+#endif
     };
 
     struct BossPostureBarData
@@ -29,23 +93,7 @@ namespace ER
         bool isStamina = false;
         bool isVisible = false;
 
-        float maxStagger = 0.0f;
-        float stagger = 0.0f;
-
-        float maxPoison = 0.0f;
-        float poison = 0.0f;
-        float maxRot = 0.0f;
-        float rot = 0.0f;
-        float maxBleed = 0.0f;
-        float bleed = 0.0f;
-        float maxBlight = 0.0f;
-        float blight = 0.0f;
-        float maxFrost = 0.0f;
-        float frost = 0.0f;
-        float maxSleep = 0.0f;
-        float sleep = 0.0f;
-        float maxMadness = 0.0f;
-        float madness = 0.0f;
+        std::map<EERDataType, BarData> barDatas = make_map<EERDataType, BarData>();
 
         // Stagger reset
         float previousStagger = 1.0f; // set to 1, as 0 would conflict with checking for posture break
@@ -56,54 +104,42 @@ namespace ER
         static inline bool  drawBars = true;
         static inline bool  useStaminaForNPC = true;
         static inline float barWidth = 998.0f;
-        static inline float barHeight = 3.0f;
+        static inline float barHeight = 16.0f;
         static inline float resetStaggerTotalTime = 2.0f;
         static inline float firstBossScreenX = 963.0f;
         static inline float firstBossScreenY = 945.0f;
         static inline float nextBossBarDiffScreenY = 55.0f;
 
-        static inline bool drawPoiseBar = true;
-        static inline bool drawPoisonBar = true;
-        static inline bool drawRotBar = true;
-        static inline bool drawBleedBar = true;
-        static inline bool drawBlightBar = true;
-        static inline bool drawFrostBar = true;
-        static inline bool drawSleepBar = true;
-        static inline bool drawMadnessBar = true;
+        // Status bars
+        static inline bool  drawStatusBars = false;
+        static inline float statusBarWidth = 1020.0f;
+        static inline float statusBarHeight = 16.0f;
+        static inline float firstStatusBarDiffScreenY = 16.0f;
+        static inline float nextStatusBarDiffScreenY = 16.0f;
+
+        static inline std::map<EERDataType, bool> drawBar = make_map<EERDataType, bool>();
+
+#ifdef DEBUGLOG
+        void LogDebug();
+#endif
     };
 
-    struct PostureBarData
+    struct EntityPostureBarData
     {
         unsigned long long entityHandle = 0;
         bool  isStamina = false;
+        bool  isVisible = false;
         float screenX = 0.0f;
         float screenY = 0.0f;
         float distanceModifier = 0.0f;
-        bool  isVisible = false;
-
-        float maxStagger = 0.0f;
-        float stagger = 0.0f;
-
-        float maxPoison = 0.0f;
-        float poison = 0.0f;
-        float maxRot = 0.0f;
-        float rot = 0.0f;
-        float maxBleed = 0.0f;
-        float bleed = 0.0f;
-        float maxBlight = 0.0f;
-        float blight = 0.0f;
-        float maxFrost = 0.0f;
-        float frost = 0.0f;
-        float maxSleep = 0.0f;
-        float sleep = 0.0f;
-        float maxMadness = 0.0f;
-        float madness = 0.0f;
 
         // Position Fixing by movement velocity
         float previousScreenX = -1.0f;
         float previousScreenY = -1.0f;
         std::chrono::steady_clock::time_point gameUiUpdateTimePoint{};
         std::chrono::steady_clock::time_point gamePreviousUiUpdateTimePoint{};
+
+        std::map<EERDataType, BarData> barDatas = make_map<EERDataType, BarData>();
 
         // Stagger reset
         float previousStagger = 1.0f; // set to 1, as 0 would conflict with checking for posture break
@@ -126,14 +162,18 @@ namespace ER
         static inline double positionFixingMultiplierX = 10.0f;
         static inline double positionFixingMultiplierY = 10.0f;
 
-        static inline bool drawPoiseBar = true;
-        static inline bool drawPoisonBar = true;
-        static inline bool drawRotBar = true;
-        static inline bool drawBleedBar = true;
-        static inline bool drawBlightBar = true;
-        static inline bool drawFrostBar = true;
-        static inline bool drawSleepBar = true;
-        static inline bool drawMadnessBar = true;
+        // Status bars
+        static inline bool  drawStatusBars = false;
+        static inline float statusBarWidth = 143.0f;
+        static inline float statusBarHeight = 14.0f;
+        static inline float firstStatusBarDiffScreenY = 14.0f;
+        static inline float nextStatusBarDiffScreenY = 14.0f;
+
+        static inline std::map<EERDataType, bool> drawBar = make_map<EERDataType, bool>();
+
+#ifdef DEBUGLOG
+        void LogDebug();
+#endif
     };
 
     struct ScreenParams
@@ -222,8 +262,9 @@ namespace ER
 
         // Draws UI posture bars, use after starting imgui new frame
         void Draw();
-        ImColor getBarColor(bool isStamina, float fillRatio);
-        ImColor mixBarColor(ImVec4& minColor, ImVec4& maxColor, float fillRatio);
+        ImColor getBarColor(EERDataType StatusEffectType, float fillRatio);
+        std::pair<ImVec4, ImVec4> getMinMaxColor(EERDataType StatusEffectType);
+        void drawBar(const EPostureBarType postureBarType, const EERDataType statusEffectType, const ImVec2& position, const ImVec2& size, float fillRatio);
         void drawBar(const TextureBar& textureBar, const ImColor& color, const ImVec2& position, const ImVec2& size, const std::pair<ImVec2 /* top-left */, ImVec2 /* bot-right */>& fillOffset, float fillRatio);
         void drawBar(const ImColor& color, const ImVec2& position, const ImVec2& size, float fillRatio);
 
@@ -233,8 +274,8 @@ namespace ER
         static void updateUIBarStructs(uintptr_t moveMapStep, uintptr_t time);
         static inline void (*updateUIBarStructsOriginal)(uintptr_t, uintptr_t);
 
-        std::optional<PlayerPostureBarData> playerBar = std::nullopt;
-        std::array<std::optional<PostureBarData>, ENTITY_CHR_ARRAY_LEN> postureBars = make_array<std::optional<PostureBarData>, ENTITY_CHR_ARRAY_LEN>(std::nullopt);
+        std::optional<PlayerPostureBarData> playerPostureBar = std::nullopt;
+        std::array<std::optional<EntityPostureBarData>, ENTITY_CHR_ARRAY_LEN> entityPostureBars = make_array<std::optional<EntityPostureBarData>, ENTITY_CHR_ARRAY_LEN>(std::nullopt);
         std::array<std::optional<BossPostureBarData>, BOSS_CHR_ARRAY_LEN> bossPostureBars = make_array<std::optional<BossPostureBarData>, BOSS_CHR_ARRAY_LEN>(std::nullopt);
 
         TextureBar entityBarTexture;

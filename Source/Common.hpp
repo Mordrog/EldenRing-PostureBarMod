@@ -65,6 +65,7 @@
 #include "ImGui/imgui_internal.h"
 #include "ImGui/imgui_impl_dx12.h"
 #include "ImGui/imgui_impl_win32.h"
+#include <map>
 
 using IndexType = uint32_t;
 
@@ -78,6 +79,14 @@ constexpr auto make_array(T value) -> std::array<T, N>
     for (auto& x : a)
         x = value;
     return a;
+}
+
+template <typename EnumType, typename Value>
+std::map<EnumType, Value> make_map() {
+    std::map<EnumType, Value> m;
+    for (size_t i = 0; i < static_cast<size_t>(EnumType::MAX); ++i)
+        m[static_cast<EnumType>(i)] = Value();
+    return m;
 }
 
 inline std::vector<std::string> splitString(const std::string& inputString, const std::string& delimiter)
