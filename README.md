@@ -40,6 +40,11 @@ Here are some common issues you might encounter:
 
 ## Changelog
 
+### Beta 0.6.0
+* Added optional enemy status bars (thanks to [lrbender01](https://github.com/lrbender01))
+* Fix for D3DRenderer not checking for D3D12_COMMAND_LIST_TYPE_DIRECT when executing command list (thanks to [mahkoh](https://github.com/mahkoh))
+* Added debug logs for posture bar data
+
 ### Beta 0.5.0
 * Updated AOB and functionality of checking for open menus after patch 1.10.1
 * Fixes for logging for missing AOB (thanks to [viniciuslrangel](https://github.com/viniciuslrangel))
