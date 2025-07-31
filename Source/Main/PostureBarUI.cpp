@@ -168,13 +168,18 @@ namespace ER
                         for (size_t i = static_cast<size_t>(EERDataType::STATUSES) + 1; i < static_cast<size_t>(EERDataType::MAX); ++i)
                         {
                             EERDataType statusEffectType = static_cast<EERDataType>(i);
-                            if (bossPostureBar->drawBar[statusEffectType])
+                            if (!bossPostureBar->drawBar[statusEffectType])
                             {
-                                float fillRatio = bossPostureBar->barDatas[statusEffectType].GetRatio();
-
-                                drawBar(EPostureBarType::Boss, statusEffectType, viewportPosition, statusBarSize, fillRatio);
-                                viewportPosition.y += BossPostureBarData::nextStatusBarDiffScreenY;
+                                continue;
                             }
+                            float fillRatio = bossPostureBar->barDatas[statusEffectType].GetRatio();
+
+                            if (fillRatio <= 0.0f)
+                            {
+                                continue;
+                            }
+                            drawBar(EPostureBarType::Boss, statusEffectType, viewportPosition, statusBarSize, fillRatio);
+                            viewportPosition.y += BossPostureBarData::nextStatusBarDiffScreenY;
                         }
                     }
                 }
@@ -239,13 +244,17 @@ namespace ER
                         for (size_t i = static_cast<size_t>(EERDataType::STATUSES) + 1; i < static_cast<size_t>(EERDataType::MAX); ++i)
                         {
                             EERDataType statusEffectType = static_cast<EERDataType>(i);
-                            if (entityPostureBar->drawBar[statusEffectType])
+                            if (!entityPostureBar->drawBar[statusEffectType])
                             {
-                                float fillRatio = entityPostureBar->barDatas[statusEffectType].GetRatio();
-
-                                drawBar(EPostureBarType::Entity, statusEffectType, viewportPosition, statusBarSize, fillRatio);
-                                viewportPosition.y += EntityPostureBarData::nextStatusBarDiffScreenY;
+                                continue;
                             }
+                            float fillRatio = entityPostureBar->barDatas[statusEffectType].GetRatio();
+
+                            if (fillRatio <= 0.0f) {
+                                continue;
+                            }
+                            drawBar(EPostureBarType::Entity, statusEffectType, viewportPosition, statusBarSize, fillRatio);
+                            viewportPosition.y += EntityPostureBarData::nextStatusBarDiffScreenY;
                         }
                     }
                 }
