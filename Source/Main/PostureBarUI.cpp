@@ -171,6 +171,8 @@ namespace ER
                             if (bossPostureBar->drawBar[statusEffectType])
                             {
                                 float fillRatio = bossPostureBar->barDatas[statusEffectType].GetRatio();
+                                if (fillRatio < 0.01f)
+                                    continue;
 
                                 drawBar(EPostureBarType::Boss, statusEffectType, viewportPosition, statusBarSize, fillRatio);
                                 viewportPosition.y += BossPostureBarData::nextStatusBarDiffScreenY;
@@ -242,6 +244,8 @@ namespace ER
                             if (entityPostureBar->drawBar[statusEffectType])
                             {
                                 float fillRatio = entityPostureBar->barDatas[statusEffectType].GetRatio();
+                                if (fillRatio < 0.01f)
+                                    continue;
 
                                 drawBar(EPostureBarType::Entity, statusEffectType, viewportPosition, statusBarSize, fillRatio);
                                 viewportPosition.y += EntityPostureBarData::nextStatusBarDiffScreenY;
