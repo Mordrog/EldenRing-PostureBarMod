@@ -113,12 +113,14 @@ namespace ER
 
         // Status bars
         static inline bool  drawStatusBars = false;
-        static inline float statusBarWidth = 1020.0f;
-        static inline float statusBarHeight = 16.0f;
-        static inline float firstStatusBarDiffScreenY = 16.0f;
-        static inline float nextStatusBarDiffScreenY = 16.0f;
         static inline bool  alwaysPresent = false;
         static inline bool  drawForOnlyFirst = true;
+        static inline float statusBarWidth = 50.0f;
+        static inline float statusBarHeight = 50.0f;
+        static inline float firstStatusBarDiffScreenX = -998.0f;
+        static inline float firstStatusBarDiffScreenY = 50.0f;
+        static inline float nextStatusBarDiffScreenX = 50.0f;
+        static inline float nextStatusBarDiffScreenY = 0.0f;
 
         static inline std::map<EERDataType, bool> drawBar = make_map<EERDataType, bool>();
 
@@ -167,11 +169,13 @@ namespace ER
 
         // Status bars
         static inline bool  drawStatusBars = false;
-        static inline float statusBarWidth = 143.0f;
-        static inline float statusBarHeight = 14.0f;
-        static inline float firstStatusBarDiffScreenY = 14.0f;
-        static inline float nextStatusBarDiffScreenY = 14.0f;
         static inline bool  alwaysPresent = false;
+        static inline float statusBarWidth = 25.0f;
+        static inline float statusBarHeight = 25.0f;
+        static inline float firstStatusBarDiffScreenX = -138.0f;
+        static inline float firstStatusBarDiffScreenY = 25.0f;
+        static inline float nextStatusBarDiffScreenX = 25.0f;
+        static inline float nextStatusBarDiffScreenY = 0.0f;
 
         static inline std::map<EERDataType, bool> drawBar = make_map<EERDataType, bool>();
 
@@ -189,6 +193,13 @@ namespace ER
         static inline float gameToViewportScaling = 1.0f;
         static inline bool  autoPositionSetup = true;
         static inline bool  autoGameToViewportScaling = true;
+    };
+
+    enum class EBarShapeType
+    {
+        Rectangle,
+        Circle,
+        Last
     };
 
     enum class EFillAlignment : uint_fast8_t
@@ -215,6 +226,7 @@ namespace ER
 
     struct BarStyle
     {
+        static inline EBarShapeType statusBarShape = EBarShapeType::Circle;
         static inline EFillAlignment fillAlignment = EFillAlignment::Left;
         static inline EFillType fillType = EFillType::FullToEmpty;
         static inline EFillResizeType fillResizeType = EFillResizeType::Clip;
@@ -250,9 +262,11 @@ namespace ER
         static inline bool useTextures = true;
         static inline FillTextureOffset bossOffset = { {0.0f, 0.0f}, {0.0f, 0.0f} };
         static inline FillTextureOffset entityOffset = { {0.0f, 0.0f}, {0.0f, 0.0f} };
+        static inline ImVec2 circleOffset = { 0.0f, 0.0f };
     };
 
     typedef std::pair<TextureData /* border */, TextureData /* fill */> TextureBar;
+    typedef TextureData /* border */ TextureCircle;
 
     class PostureBarUI
     {
@@ -271,6 +285,8 @@ namespace ER
         void drawBar(const EPostureBarType postureBarType, const EERDataType statusEffectType, const ImVec2& position, const ImVec2& size, float fillRatio);
         void drawBar(const TextureBar& textureBar, const ImColor& color, const ImVec2& position, const ImVec2& size, const std::pair<ImVec2 /* top-left */, ImVec2 /* bot-right */>& fillOffset, float fillRatio);
         void drawBar(const ImColor& color, const ImVec2& position, const ImVec2& size, float fillRatio);
+        void drawCircleBar(const ImColor& color, const ImVec2& position, const ImVec2& size, float fillRatio);
+        void drawCircle(const ImColor& color, const ImVec2& position, const ImVec2& size, float fillRatio);
 
         bool isMenuOpen();
 
@@ -284,6 +300,7 @@ namespace ER
 
         TextureBar entityBarTexture;
         TextureBar bossBarTexture;
+        TextureCircle circleTexture;
         bool textureBarInit = false;
     };
 

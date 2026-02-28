@@ -173,6 +173,7 @@ namespace ER
                         float statusWidth = BossPostureBarData::statusBarWidth * ScreenParams::gameToViewportScaling;
                         ImVec2 statusBarSize = ImVec2(statusWidth, statusHeight);
 
+                        viewportPosition.x += BossPostureBarData::firstStatusBarDiffScreenX;
                         viewportPosition.y += BossPostureBarData::firstStatusBarDiffScreenY;
                         for (size_t i = static_cast<size_t>(EERDataType::STATUSES) + 1; i < static_cast<size_t>(EERDataType::MAX); ++i)
                         {
@@ -185,6 +186,7 @@ namespace ER
                             float fillRatio = bossPostureBar->barDatas[statusEffectType].GetRatio();
 
                             drawBar(EPostureBarType::Boss, statusEffectType, viewportPosition, statusBarSize, fillRatio);
+                            viewportPosition.x += BossPostureBarData::nextStatusBarDiffScreenX;
                             viewportPosition.y += BossPostureBarData::nextStatusBarDiffScreenY;
                         }
                     }
@@ -246,6 +248,7 @@ namespace ER
                         float statusWidth = EntityPostureBarData::statusBarWidth * distanceModifier * ScreenParams::gameToViewportScaling;
                         ImVec2 statusBarSize = ImVec2(statusWidth, statusHeight);
 
+                        viewportPosition.x += EntityPostureBarData::firstStatusBarDiffScreenX;
                         viewportPosition.y += EntityPostureBarData::firstStatusBarDiffScreenY;
                         for (size_t i = static_cast<size_t>(EERDataType::STATUSES) + 1; i < static_cast<size_t>(EERDataType::MAX); ++i)
                         {
@@ -258,6 +261,7 @@ namespace ER
                             float fillRatio = entityPostureBar->barDatas[statusEffectType].GetRatio();
 
                             drawBar(EPostureBarType::Entity, statusEffectType, viewportPosition, statusBarSize, fillRatio);
+                            viewportPosition.x += EntityPostureBarData::nextStatusBarDiffScreenX;
                             viewportPosition.y += EntityPostureBarData::nextStatusBarDiffScreenY;
                         }
                     }
@@ -311,7 +315,11 @@ namespace ER
     {
         const ImColor& barColor = getBarColor(erDataType, fillRatio);
 
-        if (textureBarInit)
+        if (BarStyle::statusBarShape == EBarShapeType::Circle && static_cast<size_t>(erDataType) > static_cast<size_t>(EERDataType::STATUSES))
+        {
+            drawCircleBar(barColor, position, size, fillRatio);
+        }
+        else if (textureBarInit)
         {
             const TextureBar& textureBar = postureBarType == EPostureBarType::Entity ? entityBarTexture : bossBarTexture;
             const FillTextureOffset& textureOffset = postureBarType == EPostureBarType::Entity ? TextureData::entityOffset : TextureData::bossOffset;
@@ -372,6 +380,38 @@ namespace ER
     void PostureBarUI::drawBar(const ImColor& color, const ImVec2& position, const ImVec2& size, float fillRatio)
     {
         ImGui::GetBackgroundDrawList()->AddRectFilled(position, position + size * ImVec2(fillRatio, 1.0f), color);
+    }
+
+    void PostureBarUI::drawCircleBar(const ImColor& color, const ImVec2& position, const ImVec2& size, float fillRatio)
+    {
+        ImVec2 circleFillSize = ImVec2(circleTexture.width, circleTexture.height) + TextureData::circleOffset;
+        ImVec2 circleScale(size.x / circleTexture.width, size.y / circleTexture.height);
+
+        drawCircle(color, position + ImVec2(0, circleTexture.height * 0.5f) * circleScale, circleFillSize * 0.5f * circleScale, fillRatio);
+        if (textureBarInit)
+        {
+            ImGui::GetBackgroundDrawList()->AddImage(circleTexture.texture, position - ImVec2(circleTexture.width * 0.5f, 0.0f) * circleScale, position + ImVec2(circleTexture.width * 0.5f, circleTexture.height) * circleScale, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f));
+        }
+    }
+
+    void PostureBarUI::drawCircle(const ImColor& color, const ImVec2& position, const ImVec2& size, float fillRatio)
+    {
+        int segments = 64;
+        float start_angle = -IM_PI / 2.0f;
+        float end_angle = start_angle + fillRatio * 2.0f * IM_PI;
+
+        ImVector<ImVec2> circlePoints;
+        circlePoints.push_back(position);
+
+        for (int i = 0; i <= segments; ++i)
+        {
+            float angle = start_angle + (end_angle - start_angle) * i / segments;
+            ImVec2 point = ImVec2(position.x + cosf(angle) * size.x, position.y + sinf(angle) * size.y);
+            circlePoints.push_back(point);
+        }
+
+        ImGui::GetBackgroundDrawList()->AddCircle(position, fillRatio, color, 64, 2.0f);
+        ImGui::GetBackgroundDrawList()->AddConvexPolyFilled(circlePoints.Data, circlePoints.Size, color);
     }
 
     bool PostureBarUI::isMenuOpen()

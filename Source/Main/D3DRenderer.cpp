@@ -112,6 +112,12 @@ namespace ER
             return;
         }
 
+        if (!loadTextureFileData(TextureFileData::circleBorderFile, &circleBorderFileData))
+        {
+            Logger::log("Failed to load \"" + TextureFileData::circleBorderFile + "\" texture file", LogLevel::Warning);
+            return;
+        }
+
         textureFileDataLoaded = true;
         Logger::log("All texture files loaded successfully");
     }
@@ -556,6 +562,7 @@ namespace ER
                     auto&& bossBarTextureData = initD3D12Texture(bossBarFileData, pDevice, m_srvDescriptorHeap, 3);
                     auto&& entityBarBorderTextureData = initD3D12Texture(entityBarBorderFileData, pDevice, m_srvDescriptorHeap, 4);
                     auto&& entityBarTextureData = initD3D12Texture(entityBarFileData, pDevice, m_srvDescriptorHeap, 5);
+                    auto&& circleBorderTextureData = initD3D12Texture(circleBorderFileData, pDevice, m_srvDescriptorHeap, 6);
 
                     if (!(bossBarBorderTextureData.dx12Resource && bossBarTextureData.dx12Resource && entityBarBorderTextureData.dx12Resource && entityBarTextureData.dx12Resource))
                     {
@@ -574,6 +581,9 @@ namespace ER
                         TextureData((ImTextureID)entityBarBorderTextureData.gpuHandle.ptr, (float)entityBarBorderTextureData.width, (float)entityBarBorderTextureData.height), 
                         TextureData((ImTextureID)entityBarTextureData.gpuHandle.ptr, (float)entityBarTextureData.width, (float)entityBarTextureData.height)
                     );
+
+                    g_postureUI->circleTexture = TextureCircle(TextureData((ImTextureID)circleBorderTextureData.gpuHandle.ptr, (float)circleBorderTextureData.width, (float)circleBorderTextureData.height));
+                    
                     g_postureUI->textureBarInit = true;
                     Logger::log("All texture init successfully");
                 }
@@ -881,5 +891,6 @@ namespace ER
         stbi_image_free(entityBarFileData.data);
         stbi_image_free(bossBarBorderFileData.data);
         stbi_image_free(bossBarFileData.data);
+        stbi_image_free(circleBorderFileData.data);
     }
 }

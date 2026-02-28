@@ -16,7 +16,7 @@ bool loadIni()
         INIStructure ini;
 
         if (!config.read(ini))
-            throw std::exception("Failed to read PostureModConfig.ini in mods folder");
+            throw std::exception("Failed to read PostureBarModConfig.ini in mods folder");
 
         //-----------------------------------------------------------------------------------
         //                                        General
@@ -37,6 +37,7 @@ bool loadIni()
         TextureFileData::bossBorderFile = dllPath + ini["Textures"].get("BossBarBorderFile");
         TextureFileData::entityBarFile = dllPath + ini["Textures"].get("EntityBarFillFile");
         TextureFileData::entityBorderFile = dllPath + ini["Textures"].get("EntityBarBorderFile");
+        TextureFileData::circleBorderFile = dllPath + ini["Textures"].get("CircleBorderFile");
         TextureData::bossOffset = FillTextureOffset{
             { std::stof(ini["Textures"].get("BossFillTopLeftOffsetX")), std::stof(ini["Textures"].get("BossFillTopLeftOffsetY")) },
             { std::stof(ini["Textures"].get("BossFillBotRightOffsetX")), std::stof(ini["Textures"].get("BossFillBotRightOffsetY")) }
@@ -45,10 +46,13 @@ bool loadIni()
             { std::stof(ini["Textures"].get("EntityFillTopLeftOffsetX")), std::stof(ini["Textures"].get("EntityFillTopLeftOffsetY")) },
             { std::stof(ini["Textures"].get("EntityFillBotRightOffsetX")), std::stof(ini["Textures"].get("EntityFillBotRightOffsetY")) }
         };
+        TextureData::circleOffset = { std::stof(ini["Textures"].get("CircleFillOffsetX")), std::stof(ini["Textures"].get("CircleFillOffsetY")) };
 
         //-----------------------------------------------------------------------------------
         //                                        Style
         //-----------------------------------------------------------------------------------
+        BarStyle::statusBarShape = EBarShapeType(stoi(ini["Style"].get("StatusBarShape")));
+        assert((int)BarStyle::statusBarShape >= 0 && BarStyle::statusBarShape < EBarShapeType::Last);
         BarStyle::fillAlignment = EFillAlignment(stoi(ini["Style"].get("FillAlignment")));
         assert((int)BarStyle::fillAlignment >= 0 && BarStyle::fillAlignment < EFillAlignment::Last);
         BarStyle::fillType = EFillType(stoi(ini["Style"].get("FillType")));
@@ -153,7 +157,9 @@ bool loadIni()
         }
         BossPostureBarData::statusBarWidth = std::stof(ini["Boss Posture Bar"].get("StatusBarWidth"));
         BossPostureBarData::statusBarHeight = std::stof(ini["Boss Posture Bar"].get("StatusBarHeight"));
+        BossPostureBarData::firstStatusBarDiffScreenX = std::stof(ini["Boss Posture Bar"].get("FirstStatusBarDiffScreenX"));
         BossPostureBarData::firstStatusBarDiffScreenY = std::stof(ini["Boss Posture Bar"].get("FirstStatusBarDiffScreenY"));
+        BossPostureBarData::nextStatusBarDiffScreenX = std::stof(ini["Boss Posture Bar"].get("NextStatusBarDiffScreenX"));
         BossPostureBarData::nextStatusBarDiffScreenY = std::stof(ini["Boss Posture Bar"].get("NextStatusBarDiffScreenY"));
 
         //-----------------------------------------------------------------------------------
@@ -190,7 +196,9 @@ bool loadIni()
         }
         EntityPostureBarData::statusBarWidth = std::stof(ini["Entity Posture Bar"].get("StatusBarWidth"));
         EntityPostureBarData::statusBarHeight = std::stof(ini["Entity Posture Bar"].get("StatusBarHeight"));
+        EntityPostureBarData::firstStatusBarDiffScreenX = std::stof(ini["Entity Posture Bar"].get("FirstStatusBarDiffScreenX"));
         EntityPostureBarData::firstStatusBarDiffScreenY = std::stof(ini["Entity Posture Bar"].get("FirstStatusBarDiffScreenY"));
+        EntityPostureBarData::nextStatusBarDiffScreenX = std::stof(ini["Entity Posture Bar"].get("NextStatusBarDiffScreenX"));
         EntityPostureBarData::nextStatusBarDiffScreenY = std::stof(ini["Entity Posture Bar"].get("NextStatusBarDiffScreenY"));
 
         //-----------------------------------------------------------------------------------
@@ -241,7 +249,9 @@ bool loadIni()
     Logger::log("\t\tEntityBorderFile: " + TextureFileData::entityBorderFile);
     Logger::log("\t\tBossFillOffset: " + std::to_string(TextureData::bossOffset));
     Logger::log("\t\tEntityFillOffset: " + std::to_string(TextureData::entityOffset));
+    Logger::log("\t\tCircleFillOffset: " + std::to_string(TextureData::circleOffset));
     Logger::log("\tStyle:");
+    Logger::log("\t\tStatusBarShape: " + std::to_string((int)BarStyle::statusBarShape));
     Logger::log("\t\tFillAlignment: " + std::to_string((int)BarStyle::fillAlignment));
     Logger::log("\t\tFillType: " + std::to_string((int)BarStyle::fillType));
     Logger::log("\t\tFillResizeType: " + std::to_string((int)BarStyle::fillResizeType));
@@ -270,7 +280,9 @@ bool loadIni()
     Logger::log("\t\tDrawStatusBars: " + std::to_string(BossPostureBarData::drawStatusBars));
     Logger::log("\t\tStatusBarWidth: " + std::to_string(BossPostureBarData::statusBarWidth));
     Logger::log("\t\tStatusBarHeight: " + std::to_string(BossPostureBarData::statusBarHeight));
+    Logger::log("\t\tFirstStatusBarDiffScreenX: " + std::to_string(BossPostureBarData::firstStatusBarDiffScreenX));
     Logger::log("\t\tFirstStatusBarDiffScreenY: " + std::to_string(BossPostureBarData::firstStatusBarDiffScreenY));
+    Logger::log("\t\tNextStatusBarDiffScreenX: " + std::to_string(BossPostureBarData::nextStatusBarDiffScreenX));
     Logger::log("\t\tNextStatusBarDiffScreenY: " + std::to_string(BossPostureBarData::nextStatusBarDiffScreenY));
     Logger::log("\tEntity Posture Bar:");
     Logger::log("\t\tDrawBars: " + std::to_string(EntityPostureBarData::drawBars));
@@ -298,7 +310,9 @@ bool loadIni()
     Logger::log("\t\tDrawStatusBars: " + std::to_string(EntityPostureBarData::drawStatusBars));
     Logger::log("\t\tStatusBarWidth: " + std::to_string(EntityPostureBarData::statusBarWidth));
     Logger::log("\t\tStatusBarHeight: " + std::to_string(EntityPostureBarData::statusBarHeight));
+    Logger::log("\t\tFirstStatusBarDiffScreenX: " + std::to_string(EntityPostureBarData::firstStatusBarDiffScreenX));
     Logger::log("\t\tFirstStatusBarDiffScreenY: " + std::to_string(EntityPostureBarData::firstStatusBarDiffScreenY));
+    Logger::log("\t\tNextStatusBarDiffScreenX: " + std::to_string(EntityPostureBarData::nextStatusBarDiffScreenX));
     Logger::log("\t\tNextStatusBarDiffScreenY: " + std::to_string(EntityPostureBarData::nextStatusBarDiffScreenY));
     Logger::log("\tExperimental:");
     Logger::log("\t\tHideBarsOnMenu: " + std::to_string(hideBarsOnMenu));

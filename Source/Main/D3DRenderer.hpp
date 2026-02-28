@@ -13,6 +13,7 @@ namespace ER
         static inline std::string bossBorderFile = "PostureBarResources\\BossBarBorder.png";
         static inline std::string entityBarFile = "PostureBarResources\\EntityBar.png";
         static inline std::string entityBorderFile = "PostureBarResources\\EntityBarBorder.png";
+        static inline std::string circleBorderFile = "PostureBarResources\\CircleBorder.png";
     };
 
     struct D3D12TextureData
@@ -109,6 +110,7 @@ namespace ER
         TextureFileData entityBarBorderFileData;
         TextureFileData bossBarFileData;
         TextureFileData bossBarBorderFileData;
+        TextureFileData circleBorderFileData;
         bool textureFileDataLoaded = false;
 
         ID3D12DescriptorHeap* m_srvDescriptorHeap{};
