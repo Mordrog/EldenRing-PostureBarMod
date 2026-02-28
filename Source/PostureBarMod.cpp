@@ -136,6 +136,7 @@ bool loadIni()
         BossPostureBarData::firstBossScreenY = std::stof(ini["Boss Posture Bar"].get("FirstBossScreenY"));
         BossPostureBarData::nextBossBarDiffScreenY = std::stof(ini["Boss Posture Bar"].get("NextBossBarDiffScreenY"));
 
+        BossPostureBarData::alwaysPresent = ini["Boss Posture Bar"].get("AlwaysPresent") == "true";
         BossPostureBarData::drawBar[EERDataType::Stagger] = true;
         BossPostureBarData::drawBar[EERDataType::Stamina] = true;
         BossPostureBarData::drawBar[EERDataType::Poison] = ini["Boss Posture Bar"].get("DrawPoisonBar") == "true";
@@ -172,6 +173,7 @@ bool loadIni()
         EntityPostureBarData::positionFixingMultiplierX = std::stof(ini["Entity Posture Bar"].get("PositionFixingMultiplierX"));
         EntityPostureBarData::positionFixingMultiplierY = std::stof(ini["Entity Posture Bar"].get("PositionFixingMultiplierY"));
 
+        EntityPostureBarData::alwaysPresent = ini["Entity Posture Bar"].get("AlwaysPresent") == "true";
         EntityPostureBarData::drawBar[EERDataType::Stagger] = true;
         EntityPostureBarData::drawBar[EERDataType::Stamina] = true;
         EntityPostureBarData::drawBar[EERDataType::Poison] = ini["Entity Posture Bar"].get("DrawPoisonBar") == "true";
@@ -255,6 +257,7 @@ bool loadIni()
     Logger::log("\t\tFirstBossScreenX: " + std::to_string(BossPostureBarData::firstBossScreenX));
     Logger::log("\t\tFirstBossScreenY: " + std::to_string(BossPostureBarData::firstBossScreenY));
     Logger::log("\t\tNextBossBarDiffScreenY: " + std::to_string(BossPostureBarData::nextBossBarDiffScreenY));
+    Logger::log("\t\tAlwaysPresent: " + std::to_string(BossPostureBarData::alwaysPresent));
     Logger::log("\t\tDrawPoisonBar: " + std::to_string(BossPostureBarData::drawBar[EERDataType::Poison]));
     Logger::log("\t\tDrawRotBar: " + std::to_string(BossPostureBarData::drawBar[EERDataType::Rot]));
     Logger::log("\t\tDrawBleedBar: " + std::to_string(BossPostureBarData::drawBar[EERDataType::Bleed]));
@@ -282,6 +285,7 @@ bool loadIni()
     Logger::log("\t\tUsePositionFixing: " + std::to_string(EntityPostureBarData::usePositionFixing));
     Logger::log("\t\tPositionFixingMultiplierX: " + std::to_string(EntityPostureBarData::positionFixingMultiplierX));
     Logger::log("\t\tPositionFixingMultiplierY: " + std::to_string(EntityPostureBarData::positionFixingMultiplierY));
+    Logger::log("\t\tAlwaysPresent: " + std::to_string(EntityPostureBarData::alwaysPresent));
     Logger::log("\t\tDrawPoisonBar: " + std::to_string(EntityPostureBarData::drawBar[EERDataType::Poison]));
     Logger::log("\t\tDrawRotBar: " + std::to_string(EntityPostureBarData::drawBar[EERDataType::Rot]));
     Logger::log("\t\tDrawBleedBar: " + std::to_string(EntityPostureBarData::drawBar[EERDataType::Bleed]));

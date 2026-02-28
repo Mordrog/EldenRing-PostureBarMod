@@ -61,6 +61,7 @@ namespace ER
         void SetInverseValue(int inValue, int inMaxValue) { maxValue = static_cast<float>(inMaxValue); value = maxValue - static_cast<float>(inValue); };
         float GetRatio() { return value / maxValue; }
         bool IsValueMax() { return value == maxValue; }
+        bool IsValueZeroOrLess() { return value <= 0; }
     };
 
     struct PlayerPostureBarData
@@ -116,6 +117,7 @@ namespace ER
         static inline float statusBarHeight = 16.0f;
         static inline float firstStatusBarDiffScreenY = 16.0f;
         static inline float nextStatusBarDiffScreenY = 16.0f;
+        static inline bool  alwaysPresent = false;
 
         static inline std::map<EERDataType, bool> drawBar = make_map<EERDataType, bool>();
 
@@ -168,6 +170,7 @@ namespace ER
         static inline float statusBarHeight = 14.0f;
         static inline float firstStatusBarDiffScreenY = 14.0f;
         static inline float nextStatusBarDiffScreenY = 14.0f;
+        static inline bool  alwaysPresent = false;
 
         static inline std::map<EERDataType, bool> drawBar = make_map<EERDataType, bool>();
 
