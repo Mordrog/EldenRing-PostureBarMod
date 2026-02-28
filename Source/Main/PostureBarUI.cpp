@@ -128,6 +128,8 @@ namespace ER
 
         if (BossPostureBarData::drawBars)
         {
+            bool drawnOneStatusBar = false;
+
             for (IndexType i = 0; i < BOSS_CHR_ARRAY_LEN; i++)
             {
                 if (auto bossPostureBar = bossPostureBars[i]; bossPostureBar && bossPostureBar->isVisible)
@@ -158,8 +160,15 @@ namespace ER
                         drawBar(EPostureBarType::Boss, erDataType, viewportPosition, barSize, fillRatio);
                     }
 
-                    if (bossPostureBar->drawStatusBars)
+                    if (bossPostureBar->drawStatusBars && !drawnOneStatusBar)
                     {
+                        if (BossPostureBarData::drawForOnlyFirst)
+                        {
+                            // reset to first bosse's position
+                            viewportPosition.y += ((float)i * BossPostureBarData::nextBossBarDiffScreenY) * ScreenParams::gameToViewportScaling;
+                            drawnOneStatusBar = true;
+                        }
+
                         float statusHeight = BossPostureBarData::statusBarHeight * ScreenParams::gameToViewportScaling;
                         float statusWidth = BossPostureBarData::statusBarWidth * ScreenParams::gameToViewportScaling;
                         ImVec2 statusBarSize = ImVec2(statusWidth, statusHeight);

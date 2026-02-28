@@ -118,6 +118,7 @@ namespace ER
         static inline float firstStatusBarDiffScreenY = 16.0f;
         static inline float nextStatusBarDiffScreenY = 16.0f;
         static inline bool  alwaysPresent = false;
+        static inline bool  drawForOnlyFirst = true;
 
         static inline std::map<EERDataType, bool> drawBar = make_map<EERDataType, bool>();
 
