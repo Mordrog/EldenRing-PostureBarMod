@@ -12,6 +12,10 @@ The mod was created with the intention of presenting enemy posture as a UI eleme
 
 ![posture_bar_texture](https://user-images.githubusercontent.com/23028397/236690919-6ed2b655-0eb2-41f1-aa92-8a6eb3204207.PNG)
 
+### New optional Circle Status Bars
+
+<img width="1074" height="152" alt="PostureBarMod_CircleStatusBars" src="https://github.com/user-attachments/assets/3e4edfc9-dcd4-42a9-80e2-bc368d7186af" />
+
 ## Instalation
 
 First you will have to remember that you cannot play on official servers using this (or in fact any) mod.
@@ -39,6 +43,15 @@ Here are some common issues you might encounter:
 **Ingart** for being passionate tester the best brother
 
 ## Changelog
+
+### Beta 0.7.0
+* Added optional bar style by [Mrj760](https://github.com/mrj760)
+* Added option to not display status bars that are not filled
+* Added option to display status bars of only first alive boss
+* Added circle styled status Bars
+* Updated Blight status bar color to more adequate one
+* Changed release folder structure to not be inside additional folder
+* Seperated custom styled bars to seperate downloadable files
 
 ### Beta 0.6.0
 * Added optional enemy status bars (thanks to [lrbender01](https://github.com/lrbender01))
